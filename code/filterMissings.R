@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # used like this:
-# Rscript code/filterByMissingPercentage.R data/transposed_final.csv data/expressions_with_missings_filtered.csv
+# Rscript code/filterMissings.R data/transposed_final.csv data/expressions_with_missings_filtered.csv
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -11,7 +11,7 @@ if (length(args)==0) {
 	stop("Please specify the outputfile location.", call.=FALSE)
 }
 
-threshold <- 0.05
+threshold <- 0.1
 
 data <- read.csv(args[1], header = TRUE)
 
@@ -63,4 +63,4 @@ repeat{
 	data <- data[filterListCols]
 }
 
-write.csv(data, file=args[2], row.names=FALSE)
+write.csv(data, file=args[2], row.names=FALSE, na="")
