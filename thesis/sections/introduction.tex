@@ -1,8 +1,19 @@
 \chapter{Introduction}
 \label{chapter:introduction}
 
-With the decrease of main-memory prices over the past decades, in-memory databases have become a feasible data store for state of the art enterprise systems.
-Columnar in-memory databases, such as SAP HANA~\cite{Farber:2012:SHD:2094114.2094126} or Hyrise~\cite{grund2010hyrise}, combine previously separated \gls{oltp} and \gls{olap} systems into one single data store~\cite{Plattner:2009:CDA:1559845.1559846}.
+According to the WHO, cancer was the second largest cause of death around the world in 2015 being the reason of almost 1 out of 6 deaths.\footnote{\url{http://www.who.int/cancer/en/}} Statistics from 2012 estimate that there were 14.1 million new cancer patients while 8.2 million people died from it. \cite{Torre2015} Moreover, prognosis for the future estimate around 23.6 million new cancer patients per year in 2030. \footnote{\url{http://www.cancerresearchuk.org/health-professional/cancer-statistics/worldwide-cancer}} This shows how severe this disease impacts humankind.
+
+However, cancer is not just one single disease. There are more than 100 different types and subtypes of cancer\footnote{\url{https://www.cancer.gov/types}}. Moreover, treatments and their effectiveness may vary substantially from type to type. Therefore, an accurate diagnosis of cancer type is crucial in order to improve treatment success and reduce costs. 
+
+One approach to advance cancer diagnosis is the utilization of computational methods. In particular, sequencing the transcriptome of samples from patients with various cancer types enables the analysis of the disease for research through computational methods. One aspect of this analysis is to try and classify samples. In recent years, advances in sequencing technology enabled the development of RNA-Sequencing (RNA-Seq), a method that provides higher coverage and greater resolution than previous techniques. Most RNA-Seq experiments feature few samples (in the tens or hundreds) and measure gene expression levels in the order of ten thousand. 
+
+Therefore, classification using machine learning approaches in these scenarios suffers from the curse of dimensionality resulting in feasibility problems, mainly extremely long processing times. To prevent this, feature selection or differential gene expression (DGE) techniques have been utilized and even especially developed for the field of bioinformatics. Their goal is to reduce the set of genes used in machine learning models to a small number that achieves good performance while providing reasonable computation time. Moreover, the selected genes can be seen as associated with the investigated disease.
+
+On the other hand, 	existing knowledge bases like the Comparative Toxicogenomics Database (CTD)\footnote{http://ctdbase.org/} or UniProt\footnote{http://www.uniprot.org/} already contain a lot of information about the connection between diseases and genes. The information about these associations could already be used in the gene selection stage. This would erase the need of employing feature selection.
+
+Therefore, the goal of this master's thesis is to examine whether the utilization of external biological knowledge for gene selection in cancer classification achieves performance comparable to the results of popular feature selection techniques. 
+
+The rest of the thesis is organized as follows. Chapter 2 covers related work and background knowledge. Chapter 3 describes the experiment conducted and lists the results. Those results are evaluated in chapter 4. A discussion follows in chapter 5. Finally, chapter 6 will conclude and discuss possible future work.
 
 \chapter{Motivation}
 \label{chapter:Motivation}
