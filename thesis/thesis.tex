@@ -1,0 +1,64 @@
+%!TEX TS-program = pdflatex
+\input{header}
+
+\newcommand{\TITLE}{Superb English Titel}\newcommand{\SUBTITLE}{Toller Deutscher Titel}
+\newcommand{\AUTHOR}{Vorname Nachname}
+\newcommand{\EMAIL}{Name@student.hpi.uni-potsdam.de}
+\newcommand{\SUPERVISOR}{M. Sc. Vorname Nachname}
+\lstset{breaklines=true, 
+    numbersep=5pt, 
+ 	stepnumber=1,
+	numbers=left,
+	captionpos=b,
+	float=htbp,
+    basicstyle=\ttfamily\fontsize{9}{12}\selectfont
+}
+\lstset{frame=tb, aboveskip=0.5cm, belowskip=0.5cm}
+
+\newcommand{\todo}[1]{
+  \marginpar{\textbf{\textcolor{hpi}{TODO #1}}}
+}
+
+\input{glossary}
+
+\begin{document}
+	\input{title}
+	\pagestyle{empty}
+	\cleardoublepage
+	
+	\pagestyle{fancy}
+	\pagenumbering{roman}
+	\input{sections/abstract}
+	\clearpage
+	\input{sections/acknowledgment}
+	\glsresetall
+	\setcounter{tocdepth}{4}
+	\tableofcontents
+	\glsresetall
+	\cleardoublepage
+	\phantomsection \label{listoffig}
+	\addcontentsline{toc}{section}{List of Figures}
+	\listoffigures
+	\glsresetall
+	\newpage
+	\phantomsection \label{listoftab}
+	\addcontentsline{toc}{section}{List of Tables}
+	\listoftables
+	\newpage
+	\glsresetall
+	\pagenumbering {arabic}
+	\setcounter{page}{0}
+	\input{sections/introduction}
+	\input{sections/relatedWork}
+	\input{sections/conceptApproachSolution}
+	\input{sections/evaluation}
+	\input{sections/conclusion}
+	\input{sections/futureWork}
+	\clearpage
+%	\printglossary[type=\acronymtype,style=modsuper]
+	\bibliography{thesis}
+	\begin{appendices}
+	\input{sections/appendix}
+	\end{appendices}
+	\input{self}
+\end{document}
