@@ -1,4 +1,6 @@
 \chapter{Related Work}
 \label{chapter:relatedWork}
 
-Related Work.
+
+Huey et al. developed an integrative gene selection approach that incorporates biological knowledge into the selection process. They first applied information gain to select features with discriminative power. Those genes were then associated with one another using annotations from either Gene Ontology or KEGG Pathways or both. This groups together genes with similar biological functions. An association analysis employing the FP-Growth algorithm mined frequent itemsets of genes co-occurring  often. Those sets were ranked by their average discriminative power as calculated from information gain. The final genes for classification were chosen by using the most discriminative gene from the top k frequent itemsets. This approach yielded better results than purely employing information gain on four different cancer datasets using Naive Bayes, Logistic Regression and Support Vector Machine classifiers. Moreover, they needed small amounts of selected genes to achieve this. This integration of biological knowledge furthermore allows a more meaningful interpretation of results. 
+\cite{Huey2014}
