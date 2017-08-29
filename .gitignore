@@ -1,6 +1,7 @@
 ###### LATEX
 
 thesis/thesis.pdf
+*.tks
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
