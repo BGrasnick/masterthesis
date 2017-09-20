@@ -40,7 +40,7 @@ def main(infile, outfile, entity, identifier):
     for line in fi:
         intfield = line.strip() 
         fo = open(outfile + "_" + intfield + ".tsv", "w") 
-        fo.write('c1.diseaseId\tc1.name\tc1.diseaseClassName\tc1.STY\tc1.MESH\tc1.OMIM\tc1.type\tc2.geneId\tc2.symbol\tc2.uniprotId\tc2.description\tc2.pantherNamec0.score\tc0.EI\tc0.Npmids\tc0.Nsnps\n')
+        fo.write('c1.diseaseId\tc1.name\tc1.diseaseClassName\tc1.STY\tc1.MESH\tc1.OMIM\tc1.type\tc2.geneId\tc2.symbol\tc2.uniprotId\tc2.description\tc2.pantherName\tc0.score\tc0.EI\tc0.Npmids\tc0.Nsnps\n')
         str = "";
         MSG = "" 
         seq1 = ("querying entity :  ", intfield, "  " )
