@@ -20,13 +20,13 @@ for columnName in df.columns[2:]:
 	column = df[columnName]
 	minimum, maximum = column.min(), column.max()
 
-	if column.mean() - column.std()*2 < minimum:
-		minimum = column.mean() - column.std()*2.01
+	if column.mean() - column.std()/2 < minimum:
+		minimum = column.mean() - column.std()/2.01
 
-	if column.mean() + column.std()*2 > maximum:
-		maximum = column.mean() + column.std()*2.01
+	if column.mean() + column.std()/2 > maximum:
+		maximum = column.mean() + column.std()/2.01
 
-	bins = [minimum, column.mean() - column.std()*2, column.mean() + column.std()*2, maximum]
+	bins = [minimum, column.mean() - column.std()/2, column.mean() + column.std()/2, maximum]
 
 	discretized = pd.cut(column, bins, labels=[-1,0,1])
 	discretized_df[columnName] = discretized
