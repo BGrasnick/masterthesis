@@ -7,6 +7,9 @@
 # the output file name
 # the type of entity (gene or disease)
 # the type of identifier 
+#
+# to run: python disgenet_python3.py diseases_UMLS_codes.txt ../../data/disgenet/results disease cui 
+#
 ###############################################################################
 
 import argparse
