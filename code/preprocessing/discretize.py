@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv("./data/expressions_with_missings_filtered_01.csv", header=0)
+df = pd.read_csv("../../data/filtered.csv", header=0)
 
 discretized_df = pd.DataFrame()
 
@@ -33,4 +33,4 @@ for columnName in df.columns[2:]:
 
 	i += 1
 
-discretized_df.to_csv("./discretized.csv", index=False)
+discretized_df.to_csv("../../discretized.csv", index=False)

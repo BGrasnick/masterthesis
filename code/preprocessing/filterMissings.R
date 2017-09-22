@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # used like this:
-# Rscript code/filterMissings.R data/transposed_final.csv data/expressions_with_missings_filtered.csv
+# Rscript code/filterMissings.R data/transposed_final.csv data/filtered.csv
 
 args = commandArgs(trailingOnly=TRUE)
 
