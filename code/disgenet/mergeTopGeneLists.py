@@ -1,17 +1,15 @@
 import pandas as pd
 import glob
 
-geneSet = set()
+def mergeTopGeneLists(path, mergedTopGenesLocation):
 
-path = "../../data/disgenet/selectedTop10/*.tsv"
+    geneSet = set()
 
+    for fname in glob.glob(path):
+        df = pd.read_csv(fname)
 
-for fname in glob.glob(path):	
-	df = pd.read_csv(fname)
+        geneSet.update(df["c2.symbol"].tolist())
 
-	geneSet.update(df["c2.symbol"].tolist())
-
-
-with open("../../data/disgenet/mergedList.csv", "w") as outputfile:
-	for item in geneSet:
-  		outputfile.write("%s\n" % item)
+    with open(mergedTopGenesLocation, "w") as outputfile:
+        for item in geneSet:
+            outputfile.write("%s\n" % item)
