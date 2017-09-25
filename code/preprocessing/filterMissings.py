@@ -2,14 +2,15 @@ import missingno as msno
 
 import pandas as pd
 
-import gc
+def filterMissings(threshold, rawDataLocation, missingsFilteredLocation):
 
-threshold = 0.1
+    df = pd.read_csv(rawDataLocation)
 
-df = pd.read_csv("../../data/transposed_final.csv")
+    # first filter out the genes that have more missings than threshold
+    filtered_gene_data = msno.nullity_filter(df, filter = 'top', p = 1 - threshold)
 
-filtered_gene_data = msno.nullity_filter(df, filter = 'top', p = 1 - threshold)
+    # second transpose matrix and filter out samples that have more missings than threshold
+    filtered_gene_sample_data = msno.nullity_filter(filtered_gene_data.T, filter = 'top', p = 1 - threshold)
 
-filtered_gene_sample_data = msno.nullity_filter(filtered_gene_data.T, filter = 'top', p = 1 - threshold)
-
-filtered_gene_sample_data.T.to_csv("../../data/filtered.csv", index=False)
+    # transpose back into original orientation and save
+    filtered_gene_sample_data.T.to_csv(missingsFilteredLocation, index=False)
