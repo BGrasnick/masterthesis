@@ -21,10 +21,10 @@ for columnName in df.columns[2:]:
 	minimum, maximum = column.min(), column.max()
 
 	if column.mean() - column.std()/2 < minimum:
-		minimum = column.mean() - column.std()/2.01
+		minimum = column.mean() - column.std()/1.99
 
 	if column.mean() + column.std()/2 > maximum:
-		maximum = column.mean() + column.std()/2.01
+		maximum = column.mean() + column.std()/1.99
 
 	bins = [minimum, column.mean() - column.std()/2, column.mean() + column.std()/2, maximum]
 
@@ -33,4 +33,4 @@ for columnName in df.columns[2:]:
 
 	i += 1
 
-discretized_df.to_csv("../../discretized.csv", index=False)
+discretized_df.to_csv("../../data/discretized.csv", index=False)
