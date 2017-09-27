@@ -1,15 +1,27 @@
 import pandas as pd
-import glob
+import glob, csv, operator
+from collections import defaultdict
 
 def mergeTopGeneLists(path, mergedTopGenesLocation):
 
-    geneSet = set()
+    geneDict = defaultdict()
 
     for fname in glob.glob(path):
         df = pd.read_csv(fname)
 
-        geneSet.update(df["c2.symbol"].tolist())
+        for row in df.itertuples():
 
-    with open(mergedTopGenesLocation, "w") as outputfile:
-        for item in geneSet:
-            outputfile.write("%s\n" % item)
+            if row[3] in geneDict.keys():
+                print(row[3])
+                print(row[4])
+
+            if row[3] not in geneDict.keys() or geneDict[row[3]] < row[4]:
+                geneDict[row[3]] = row[4]
+
+    sorted_GeneList = sorted(geneDict.items(), key=operator.itemgetter(1), reverse=True)
+
+    with open(mergedTopGenesLocation, "w") as csvfile:
+        csvWriter = csv.writer(csvfile, quotechar='"', quoting=csv.QUOTE_ALL)
+        csvWriter.writerow(["attributeName","score"])
+        for k, v in sorted_GeneList:
+            csvWriter.writerow([str(k),str(v)])
