@@ -12,7 +12,7 @@ def selectTopGenesPerDisease(geneDiseaseAssociationsLocation, useThreshold, thre
         newNameList = fname.split("/")
 
         if useThreshold:
-            newNameList.insert(-1,'selectedTreshold'  + str(threshold).replace(".",""))
+            newNameList.insert(-1,'selectedThreshold'  + str(threshold).replace(".",""))
             newName = "/".join(newNameList)
             if not os.path.isdir("/".join(newNameList[0:-1])):
                 os.makedirs("/".join(newNameList[0:-1]))
