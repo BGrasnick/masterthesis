@@ -1,54 +1,60 @@
 package de.hpi.bmg;
 
 import com.opencsv.CSVReader;
+import weka.core.Instances;
+import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-public class RemoveTest {
+public class AttributeRemover {
 
-    public static void main(String[] args) throws Exception {
+    public static Instances removeUnusedAttributes(Instances data, int numberOfAttributesRetained, String attributeRankingOutputFileLocation) {
 
-        Properties prop = new Properties();
-
-        InputStream input = null;
+        CSVReader reader = null;
+        List<String[]> lines = null;
 
         try {
-            input = new FileInputStream("config.properties");
+            reader = new CSVReader(new FileReader(attributeRankingOutputFileLocation), ',');
 
-            // load a properties file
-            prop.load(input);
+            String[] header = reader.readNext();
+
+            lines = reader.readAll();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Remove remove;
+        List<String[]> subItems = new ArrayList<String[]>(lines.subList(0, numberOfAttributesRetained));
 
+        List<String> attributeIndices = new ArrayList<String>();
 
-
-        CSVReader reader = new CSVReader(new FileReader(prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv"), ',');
-
-        String[] header = reader.readNext();
-        
-        List<String[]> lines = reader.readAll();
-
-        List<String[]> subItems = new ArrayList<String[]>(lines.subList(0, 100));
-
-        List<Integer> attributeIndices = new ArrayList<Integer>();
+        attributeIndices.add("1");
 
         for (String[] item : subItems) {
-            attributeIndices.add((int) Float.parseFloat(item[2]));
+            attributeIndices.add("" + ((int) Float.parseFloat(item[2]) + 1));
         }
 
-        System.out.println(attributeIndices);
+        Remove remove = new Remove();
 
-        //remove.se
+        remove.setAttributeIndices(String.join(",",attributeIndices));
+
+        remove.setInvertSelection(true);
+
+        Instances newData = null;
+
+        try {
+            remove.setInputFormat(data);
+            newData = Filter.useFilter(data, remove);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return newData;
+
     }
-
-
 }

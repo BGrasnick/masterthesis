@@ -2,40 +2,33 @@ package de.hpi.bmg;
 
 import com.opencsv.CSVWriter;
 import weka.attributeSelection.*;
-import weka.core.converters.CSVLoader;
 import weka.core.Instances;
 
 import java.io.*;
-import java.util.Properties;
 
-public class Main {
+public class AttributeSelector {
 
-    public static void main(String[] args) {
+    private String selectionMethod;
+    private Instances data;
 
-        Properties prop = new Properties();
+    public AttributeSelector(String inputFile, String selectionMethod){
 
-        InputStream input = null;
+        DataLoader dl = new DataLoader(inputFile);
 
-        try {
-            input = new FileInputStream("config.properties");
-
-            // load a properties file
-            prop.load(input);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Instances data = loadData(prop.getProperty("inputFile"));
+        data = dl.getData();
 
         data.deleteAttributeAt(1);
 
         data.setClassIndex(0);
 
+        this.selectionMethod = selectionMethod;
+
+    }
+
+    public AttributeSelection selectAttributes() {
         ASEvaluation eval;
 
-        switch (prop.getProperty("attributeSelection")) {
+        switch (this.selectionMethod) {
             case "SVM-RFE":
 
                 eval = new SVMAttributeEval();
@@ -74,45 +67,44 @@ public class Main {
         // perform attribute selection
 
         try {
+            attsel.SelectAttributes(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            CSVWriter writer = new CSVWriter(new FileWriter(prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv"), ',');
+        return attsel;
+    }
 
-            String[] header = "attributeName,score,index".split(",");
+    public void saveSelectedAttributes(AttributeSelection attsel, String saveLocation) {
+
+        try {
+
+            CSVWriter writer = new CSVWriter(new FileWriter(saveLocation + this.selectionMethod + ".csv"), ',');
+
+            String[] header = {"attributeName","score","index"};
 
             writer.writeNext(header);
 
-            attsel.SelectAttributes(data);
             double[][] rankedAtts = attsel.rankedAttributes();
+
             for (int i = 0; i < rankedAtts.length; i++) {
 
-                String[] entry = (""+rankedAtts[i][1] + "," + data.attribute((int) rankedAtts[i][0]).name() + "," + rankedAtts[i][0]).split(",");
+                String attributeName = data.attribute((int) rankedAtts[i][0]).name();
+
+                String score = "" + rankedAtts[i][1];
+
+                String index = "" + (int) rankedAtts[i][0];
+
+                String[] entry = {attributeName, score, index};
 
                 writer.writeNext(entry);
             }
 
             writer.close();
 
-            // m_attributeRanking[i][1] -> value
-            // m_attributeRanking[i][0] -> ID
-            // System.out.println(attsel.toResultsString());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-    }
-
-    private static Instances loadData(String sourceFile) {
-
-        CSVLoader loader = new CSVLoader();
-        try {
-            loader.setSource(new File(sourceFile));
-            Instances data = loader.getDataSet();
-            return data;
-        } catch (IOException e) {
-            e.printStackTrace();
-            // see https://opensource.apple.com/source/Libc/Libc-320/include/sysexits.h
-            System.exit(66);
-        }
-        return null;
     }
 }
