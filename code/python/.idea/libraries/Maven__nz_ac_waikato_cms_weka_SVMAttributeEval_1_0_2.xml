@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Maven: nz.ac.waikato.cms.weka:SVMAttributeEval:1.0.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/nz/ac/waikato/cms/weka/SVMAttributeEval/1.0.2/SVMAttributeEval-1.0.2.jar!/" />
+    </CLASSES>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/nz/ac/waikato/cms/weka/SVMAttributeEval/1.0.2/SVMAttributeEval-1.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Maven: com.googlecode.matrix-toolkits-java:mtj:1.0.4">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/matrix-toolkits-java/mtj/1.0.4/mtj-1.0.4.jar!/" />
+    </CLASSES>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/matrix-toolkits-java/mtj/1.0.4/mtj-1.0.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
