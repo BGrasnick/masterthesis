@@ -13,14 +13,8 @@ public class ClassificationEvaluator {
 
     private Instances data;
 
-    public ClassificationEvaluator(String inputFile) {
-        DataLoader dl = new DataLoader(inputFile);
-
-        data = dl.getData();
-
-        data.deleteAttributeAt(1);
-
-        data.setClassIndex(0);
+    public ClassificationEvaluator(Instances data) {
+        this.data = data;
     }
 
     public String trainAndEvaluateWithTopKAttributes(int numberOfAttributesRetained, String attributeRankingOutputFileLocation) {

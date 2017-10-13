@@ -13,25 +13,33 @@ public class Main {
 
         Properties prop = loadProperties("config.properties");
 
+        DataLoader dl = new DataLoader(prop.getProperty("inputFile"));
+
+        Instances data = dl.getData();
+
+        data.deleteAttributeAt(1);
+
+        data.setClassIndex(0);
+
         /*
         String[] attributeSelectionMethods = {"SVM-RFE", "GainRatio", "InfoGain"};
 
         for (String asMethod : attributeSelectionMethods) {
-            selectAttributes(prop.getProperty("inputFile"), asMethod, prop.getProperty("attributeRankingOutputFile"));
+            selectAttributes(data, asMethod, prop.getProperty("attributeRankingOutputFile"));
         }
         */
 
         String[] allMethods = {"SVM-RFE", "GainRatio", "InfoGain", "disgenetTop15", "disgenetTop25"};
 
-        ClassificationEvaluator ce = new ClassificationEvaluator(prop.getProperty("inputFile"));
+        ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
         for (String asMethod : allMethods) {
             classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", ce);
         }
 
-        //selectAttributes(prop.getProperty("inputFile"), prop.getProperty("attributeSelection"), prop.getProperty("attributeRankingOutputFile"));
-        //removeAttributes(prop);
-        //classifyAndEvaluate(prop.getProperty("inputFile"), prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
+        //selectAttributes(data, prop.getProperty("attributeSelection"), prop.getProperty("attributeRankingOutputFile"));
+        //removeAttributes(data, prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
+        //classifyAndEvaluate(data, prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
     }
 
     private static Properties loadProperties(String propertiesLocation) {
@@ -77,23 +85,15 @@ public class Main {
 
     }
 
-    private static void removeAttributes(Properties prop) {
+    private static void removeAttributes(Instances data, String attributeRankingOutputFileLocation) {
 
-        DataLoader dl = new DataLoader(prop.getProperty("inputFile"));
-
-        Instances data = dl.getData();
-
-        data.deleteAttributeAt(1);
-
-        data.setClassIndex(0);
-
-        AttributeRemover.removeUnusedAttributes(data, 100, prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
+        AttributeRemover.removeUnusedAttributes(data, 100, attributeRankingOutputFileLocation);
 
     }
 
-    private static void selectAttributes(String inputFile, String attributeSelectionMethod, String attributeRankingOutputFile) {
+    private static void selectAttributes(Instances data, String attributeSelectionMethod, String attributeRankingOutputFile) {
 
-        AttributeSelector as = new AttributeSelector(inputFile, attributeSelectionMethod);
+        AttributeSelector as = new AttributeSelector(data, attributeSelectionMethod);
 
         AttributeSelection attsel = as.selectAttributes();
 

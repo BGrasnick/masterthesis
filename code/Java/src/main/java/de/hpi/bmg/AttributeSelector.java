@@ -11,16 +11,9 @@ public class AttributeSelector {
     private String selectionMethod;
     private Instances data;
 
-    public AttributeSelector(String inputFile, String selectionMethod){
+    public AttributeSelector(Instances data, String selectionMethod){
 
-        DataLoader dl = new DataLoader(inputFile);
-
-        data = dl.getData();
-
-        data.deleteAttributeAt(1);
-
-        data.setClassIndex(0);
-
+        this.data = data;
         this.selectionMethod = selectionMethod;
 
     }
