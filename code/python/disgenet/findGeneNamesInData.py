@@ -9,7 +9,7 @@ def findGeneNamesInData(geneListLocation, rankedGeneNameList, dataLocation, gene
 
     # get the header and add index as this is used later in the evaluation for filtering genes out from the dataset
     header = geneList.columns.values.tolist()
-    header.append("index")
+    header.insert(2, "index")
 
     # list which is later saved as our final result, add header to it
     allGenes = []
@@ -39,7 +39,7 @@ def findGeneNamesInData(geneListLocation, rankedGeneNameList, dataLocation, gene
             if not match in genesAdded:
 
                 # add gene name, score and index to our final list
-                allGenes.append((match, tup[2], df.columns.get_loc(match) - 1))
+                allGenes.append((match, tup[2], df.columns.get_loc(match) - 1, tup[3]))
 
                 genesAdded.add(match)
 

@@ -14,8 +14,8 @@ def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, top
         for row in df.itertuples():
 
             # check if the gene already exists and if so which score is bigger and add the bigger score
-            if row[3] not in geneDict.keys() or geneDict[row[3]] < row[4]:
-                geneDict[row[3]] = row[4]
+            if row[3] not in geneDict.keys() or geneDict[row[3]][0] < row[4]:
+                geneDict[row[3]] = (row[4], row[2])
 
     # sort the gene dictionary items by their score so that the gene with the biggest score is on top
     sorted_GeneList = sorted(geneDict.items(), key=operator.itemgetter(1), reverse=True)
@@ -23,6 +23,6 @@ def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, top
     # save the sorted gene list with header
     with open(mergedTopGenesLocation, "w") as csvfile:
         csvWriter = csv.writer(csvfile, quotechar='"', quoting=csv.QUOTE_ALL)
-        csvWriter.writerow(["attributeName", "score"])
+        csvWriter.writerow(["attributeName", "score", "diseaseId"])
         for k, v in sorted_GeneList:
-            csvWriter.writerow([str(k),str(v)])
+            csvWriter.writerow([str(k),str(v[0]), v[1]])
