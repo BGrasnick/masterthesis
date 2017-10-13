@@ -51,8 +51,6 @@ public class ClassificationEvaluator {
 
             //System.out.println(eval.toSummaryString(true));
 
-            System.out.println(returnString);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

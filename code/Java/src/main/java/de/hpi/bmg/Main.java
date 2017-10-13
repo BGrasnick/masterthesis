@@ -74,7 +74,6 @@ public class Main {
 
             for (int k = topKmin; k <= topKmax; k++) {
                 String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
-                System.out.println(result);
                 writer.writeNext(result.split(","));
                 writer.flush();
             }
