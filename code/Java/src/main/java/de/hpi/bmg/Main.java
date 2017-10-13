@@ -18,13 +18,13 @@ public class Main {
 
         Properties prop = loadProperties("config.properties");
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + "Starting loading data from " + prop.getProperty("inputFile"));
+        LOGGER.info(getCurrentTimestamp() + ": Starting loading data from " + prop.getProperty("inputFile"));
 
         DataLoader dl = new DataLoader(prop.getProperty("inputFile"));
 
         Instances data = dl.getData();
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + "Finished loading data from " + prop.getProperty("inputFile"));
+        LOGGER.info(getCurrentTimestamp() + ": Finished loading data from " + prop.getProperty("inputFile"));
 
         data.deleteAttributeAt(1);
 
@@ -32,30 +32,34 @@ public class Main {
 
         String[] attributeSelectionMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain"};
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Starting attribute selection with methods: " + String.join(",",attributeSelectionMethods));
+        LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with methods: " + String.join(",",attributeSelectionMethods));
 
         for (String asMethod : attributeSelectionMethods) {
             selectAttributes(data, asMethod, prop.getProperty("attributeRankingOutputFile"));
         }
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Finished attribute selection with methods: " + String.join(",",attributeSelectionMethods));
+        LOGGER.info(getCurrentTimestamp() + ": Finished attribute selection with methods: " + String.join(",",attributeSelectionMethods));
 
         String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain", "disgenetTop15", "disgenetTop25"};
 
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
+        LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
 
         for (String asMethod : allMethods) {
             classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", ce,
                     Integer.parseInt(prop.getProperty("topKmin")), Integer.parseInt(prop.getProperty("topKmax")));
         }
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
+        LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
 
         //selectAttributes(data, prop.getProperty("attributeSelection"), prop.getProperty("attributeRankingOutputFile"));
         //removeAttributes(data, prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
         //classifyAndEvaluate(data, prop.getProperty("attributeRankingOutputFile") + prop.getProperty("attributeSelection") + ".csv");
+    }
+
+    private static String getCurrentTimestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format( new Date() );
     }
 
     private static Properties loadProperties(String propertiesLocation) {
@@ -89,13 +93,13 @@ public class Main {
 
             for (int k = topKmin; k <= topKmax; k++) {
 
-                LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
+                LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
 
                 String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
                 writer.writeNext(result.split(","));
                 writer.flush();
 
-                LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
+                LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
             }
 
             writer.close();
@@ -113,7 +117,7 @@ public class Main {
 
     private static void selectAttributes(Instances data, String attributeSelectionMethod, String attributeRankingOutputFile) {
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Starting attribute selection with method " + attributeSelectionMethod);
+        LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with method " + attributeSelectionMethod);
 
         AttributeSelector as = new AttributeSelector(data, attributeSelectionMethod);
 
@@ -121,7 +125,7 @@ public class Main {
 
         as.saveSelectedAttributes(attsel, attributeRankingOutputFile);
 
-        LOGGER.info(new SimpleDateFormat().format( new Date() ) + ": Finished attribute selection with method " + attributeSelectionMethod);
+        LOGGER.info(getCurrentTimestamp() + ": Finished attribute selection with method " + attributeSelectionMethod);
 
     }
 
