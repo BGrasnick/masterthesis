@@ -34,7 +34,8 @@ public class Main {
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
         for (String asMethod : allMethods) {
-            classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", ce);
+            classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", ce,
+                    Integer.parseInt(prop.getProperty("topKmin")), Integer.parseInt(prop.getProperty("topKmax")));
         }
 
         //selectAttributes(data, prop.getProperty("attributeSelection"), prop.getProperty("attributeRankingOutputFile"));
@@ -62,7 +63,7 @@ public class Main {
         return prop;
     }
 
-    private static void classifyAndEvaluate(String attributeRankingFileLocation, ClassificationEvaluator ce) {
+    private static void classifyAndEvaluate(String attributeRankingFileLocation, ClassificationEvaluator ce, int topKmin, int topKmax) {
 
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(attributeRankingFileLocation + "_results" + ".csv"), ',');
@@ -71,7 +72,7 @@ public class Main {
 
             writer.writeNext(header);
 
-            for (int k = 2; k <= 30; k++) {
+            for (int k = topKmin; k <= topKmax; k++) {
                 String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
                 System.out.println(result);
                 writer.writeNext(result.split(","));
