@@ -1,17 +1,16 @@
 import configparser, glob
 
 from disgenet.disgenet_python3 import main
-from disgenet.findGeneNamesInData import findGeneNamesInData
-from disgenet.interleaveTopGeneLists import interleaveTopGeneLists
+from disgenet.replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
+from disgenet.interleaveGeneLists import interleaveGeneLists
 from disgenet.mergeTopGeneLists import mergeTopGeneLists
 from disgenet.selectTopGenesPerDisease import selectTopGenesPerDisease
 import pandas as pd
 import csv
 
-
 def executePipeline():
 
-    config, path, mergedTopGenesFileName, rankedGeneNameListFileName = readConfig()
+    config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation = readConfig()
 
     # retrieve gene disease associations for each disease and save in a separate file
     main("diseases_UMLS_codes.txt",config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
@@ -29,42 +28,43 @@ def executePipeline():
         # replace gene names in files from all the different diseases with the ones in the dataset
         for fname in glob.glob(path):
 
+            # put in single files in folder replaced to use later on for interleaving
             newLocation = fname.split("/")
             newLocation[5] = "replaced"
 
-            findGeneNamesInData(fname,
-                                "/".join(newLocation),
-                                df,
-                                config["filtering"]["geneNameSeparator"])
+            tupleList = loadTupleList(fname)
 
+            # get rid of the header
+            tupleList.pop(0)
 
+            replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
+
+        # load single files in folder replaced for interleaving
         newPath = path.split("/")
         newPath[5] = "replaced"
 
         # interleave gene names from the different disease files
-        results = interleaveTopGeneLists("/".join(newPath), mergedTopGenesFileName, True)
+        interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
 
-        saveResults(rankedGeneNameListFileName, results)
+        saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
 
     else:
 
+        topGeneList = []
+
         if int(config['pipeline']['interleave']) == 0:
             # merge the top genes from different diseases into one list without duplicates
-            mergeTopGeneLists(path, mergedTopGenesFileName,
-                                    config['selection'].getboolean("useThreshold"),
+            topGeneList = mergeTopGeneLists(path, config['selection'].getboolean("useThreshold"),
                                     config['selection']['threshold'],
                                     config['selection']['topK'])
 
         elif int(config['pipeline']['interleave']) == 1:
 
             # interleave the gene names from the merged disease file
-            interleaveTopGeneLists(path, mergedTopGenesFileName, False)
+            topGeneList = interleaveGeneLists(path)
 
         # find top genes from disgenet in the gene expression data by matching names and save together with score and index
-        findGeneNamesInData(mergedTopGenesFileName,
-                        rankedGeneNameListFileName,
-                        df,
-                        config["filtering"]["geneNameSeparator"])
+        replaceDisgenetWithDatasetGeneNames(topGeneList, genesWithReplacedNamesLocation, df, config["filtering"]["geneNameSeparator"])
 
 
 def readConfig():
@@ -76,34 +76,43 @@ def readConfig():
         path = "../../../data/disgenet/selectedThreshold" + str(config['selection']['threshold']) \
             .replace(".", "") + "/*.tsv"
 
-        mergedTopGenesFileName = config['dataLocations']['mergedTopGenesLocation'] + "Threshold" + \
+        mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Threshold" + \
                                  str(config['selection']['threshold']).replace(".", "") + ".csv"
 
-        rankedGeneNameListFileName = config["dataLocations"]["rankedGeneNameList"] + "Threshold" + \
+        genesWithReplacedNamesLocation = config["dataLocations"]["rankedGeneNameList"] + "Threshold" + \
                                      str(config['selection']['threshold']).replace(".", "") + ".csv"
 
     else:
 
         path = "../../../data/disgenet/selectedTop" + str(config['selection']['topK']) + "/*.tsv"
 
-        mergedTopGenesFileName = config['dataLocations']['mergedTopGenesLocation'] + "Top" + \
+        mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Top" + \
                                  str(config['selection']['topK']) + ".csv"
 
-        rankedGeneNameListFileName = config['dataLocations']['rankedGeneNameList'] + "Top" + \
+        genesWithReplacedNamesLocation = config['dataLocations']['rankedGeneNameList'] + "Top" + \
                                      str(config['selection']['topK']) + ".csv"
 
-    return config, path, mergedTopGenesFileName, rankedGeneNameListFileName
+    return config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation
 
 
-def saveResults(fileName, results):
+def saveTupleList(fileName, tupleList):
     with open(fileName, "w") as csvfile:
         csvWriter = csv.writer(csvfile, quotechar='"', quoting=csv.QUOTE_ALL)
 
         csvWriter.writerow(["attributeName", "score", "index", "diseaseId"])
 
-        for tup in results:
+        for tup in tupleList:
 
             csvWriter.writerow(list(tup))
+
+
+def loadTupleList(fileName):
+
+    with open(fileName, "r") as csvfile:
+        csvReader = csv.reader(csvfile, quotechar='"', quoting=csv.QUOTE_ALL)
+        tupleList = [tuple(line) for line in csvReader]
+
+    return tupleList
 
 if __name__ == '__main__':
 

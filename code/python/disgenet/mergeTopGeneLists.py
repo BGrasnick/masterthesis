@@ -1,8 +1,8 @@
 import pandas as pd
-import glob, csv, operator, pdb
+import glob, operator
 from collections import defaultdict
 
-def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, topK):
+def mergeTopGeneLists(path, useThreshold, threshold, topK):
 
     geneDict = defaultdict()
 
@@ -18,11 +18,6 @@ def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, top
                 geneDict[row[1]] = (row[2], row[3])
 
     # sort the gene dictionary items by their score so that the gene with the biggest score is on top
-    sorted_GeneList = sorted(geneDict.items(), key=operator.itemgetter(1), reverse=True)
+    sortedGeneList = sorted(geneDict.items(), key=operator.itemgetter(1), reverse=True)
 
-    # save the sorted gene list with header
-    with open(mergedTopGenesLocation, "w") as csvfile:
-        csvWriter = csv.writer(csvfile, quotechar='"', quoting=csv.QUOTE_ALL)
-        csvWriter.writerow(["attributeName", "score", "diseaseId"])
-        for k, v in sorted_GeneList:
-            csvWriter.writerow([str(k),str(v[0]), v[1]])
+    return [[k, v[0], v[1]] for k,v in sortedGeneList]
