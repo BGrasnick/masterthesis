@@ -93,13 +93,13 @@ public class Main {
 
             for (int k = topKmin; k <= topKmax; k++) {
 
-                LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
+                LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
 
                 String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
                 writer.writeNext(result.split(","));
                 writer.flush();
 
-                LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k);
+                LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
             }
 
             writer.close();
