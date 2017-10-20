@@ -23,7 +23,10 @@ def interleaveGeneLists(path):
 
     interleavedGeneList = []
 
-    for index in range(len(listOfGeneLists[0])):
+    # calculate all the lengths of gene lists to get the all genes even from the longest list later on
+    lengths = [len(geneList) for geneList in listOfGeneLists]
+
+    for index in range(max(lengths)):
 
         # add index-th entry of each individual (disease-based) geneList to the interleaved list
         # and sort those index-th entries by their score
