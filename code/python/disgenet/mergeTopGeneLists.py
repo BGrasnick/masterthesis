@@ -1,5 +1,5 @@
 import pandas as pd
-import glob, csv, operator
+import glob, csv, operator, pdb
 from collections import defaultdict
 
 def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, topK):
@@ -14,8 +14,8 @@ def mergeTopGeneLists(path, mergedTopGenesLocation, useThreshold, threshold, top
         for row in df.itertuples():
 
             # check if the gene already exists and if so which score is bigger and add the bigger score
-            if row[3] not in geneDict.keys() or geneDict[row[3]][0] < row[4]:
-                geneDict[row[3]] = (row[4], row[2])
+            if row[1] not in geneDict.keys() or geneDict[row[1]][0] < row[2]:
+                geneDict[row[1]] = (row[2], row[3])
 
     # sort the gene dictionary items by their score so that the gene with the biggest score is on top
     sorted_GeneList = sorted(geneDict.items(), key=operator.itemgetter(1), reverse=True)

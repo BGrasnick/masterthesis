@@ -1,9 +1,7 @@
 import pandas as pd
 import csv
 
-def findGeneNamesInData(geneListLocation, rankedGeneNameList, dataLocation, geneNameSeparator):
-
-    df = pd.read_csv(dataLocation)
+def findGeneNamesInData(geneListLocation, rankedGeneNameList, df, geneNameSeparator):
 
     geneList = pd.read_csv(geneListLocation, header=0)
 

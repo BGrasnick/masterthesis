@@ -24,7 +24,7 @@ def selectTopGenesPerDisease(geneDiseaseAssociationsLocation, useThreshold, thre
                 os.makedirs("/".join(newNameList[0:-1]))
 
             # filter entries using the threshold and save
-            df[df["c0.score"] >= float(threshold)][["c1.diseaseId", "c2.symbol", "c0.score"]].to_csv(newName)
+            df[df["c0.score"] >= float(threshold)][["c2.symbol", "c0.score", "c1.diseaseId"]].to_csv(newName, index=False)
 
         else:
             # add selectTop and the k as a directory
@@ -36,5 +36,5 @@ def selectTopGenesPerDisease(geneDiseaseAssociationsLocation, useThreshold, thre
                 os.makedirs("/".join(newNameList[0:-1]))
 
             # only retain the top k entries and save
-            df[0:int(topK)][["c1.diseaseId", "c2.symbol", "c0.score"]].to_csv(newName)
+            df[0:int(topK)][["c2.symbol", "c0.score", "c1.diseaseId"]].to_csv(newName, index=False)
 
