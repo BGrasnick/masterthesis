@@ -47,7 +47,7 @@ public class Main {
         LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
 
         for (String asMethod : allMethods) {
-            classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", ce,
+            classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", prop.getProperty("resultLocation") + asMethod + ".csv", ce,
                     Integer.parseInt(prop.getProperty("topKmin")), Integer.parseInt(prop.getProperty("topKmax")));
         }
 
@@ -82,10 +82,10 @@ public class Main {
         return prop;
     }
 
-    private static void classifyAndEvaluate(String attributeRankingFileLocation, ClassificationEvaluator ce, int topKmin, int topKmax) {
+    private static void classifyAndEvaluate(String attributeRankingFileLocation, String resultLocation, ClassificationEvaluator ce, int topKmin, int topKmax) {
 
         try {
-            CSVWriter writer = new CSVWriter(new FileWriter(attributeRankingFileLocation + "_results" + ".csv"), ',');
+            CSVWriter writer = new CSVWriter(new FileWriter(resultLocation), ',');
 
             String[] header = {"#ofAttributes","SMO","LR","NB","KNN3","KNN5"};
 
