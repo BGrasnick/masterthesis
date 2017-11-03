@@ -133,7 +133,7 @@ public class Main {
 
         long dt = end - begin;
 
-        LOGGER.info("" + dt + ",attributeSelectionMethod");
+        LOGGER.info("" + dt + "," + attributeSelectionMethod);
 
     }
 
