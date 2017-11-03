@@ -121,19 +121,19 @@ public class Main {
 
         //LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with method " + attributeSelectionMethod);
 
-        long begin = System.currentTimeMillis();
-
         AttributeSelector as = new AttributeSelector(data, attributeSelectionMethod);
 
-        AttributeSelection attsel = as.selectAttributes();
+        long begin = System.currentTimeMillis();
 
-        as.saveSelectedAttributes(attsel, attributeRankingOutputFile);
+        AttributeSelection attsel = as.selectAttributes();
 
         long end = System.currentTimeMillis();
 
         long dt = end - begin;
 
         LOGGER.info("" + dt + "," + attributeSelectionMethod);
+
+        as.saveSelectedAttributes(attsel, attributeRankingOutputFile);
 
     }
 
