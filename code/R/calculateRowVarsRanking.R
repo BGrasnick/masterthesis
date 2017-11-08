@@ -1,10 +1,17 @@
-library("genefilter", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.4")
+library(genefilter)
+library(tictoc)
 
-rawData <- read.csv("../../data/rawData.csv")
+rawData <- read.csv("../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts_WithDiseaseCodes.csv")
+
+tic("total")
+
+tic("rowVars FS")
 
 geneExpressionMatrix <- rawData[-c(1,2)]
 
 rV <- rowVars(t(geneExpressionMatrix))
+
+toc()
 
 ordered <- rV[order(-rV) , drop = FALSE]
 
@@ -16,4 +23,6 @@ orderedNameValueMatrix <- matrix(orderedNameValueList,ncol=3)
 
 colnames(orderedNameValueMatrix) <- c("attributeName", "value", "index")
 
-write.csv(orderedNameValueMatrix, file = "../../data/rankedAttributes/rowVars.csv", row.names = FALSE)
+toc()
+
+write.csv(orderedNameValueMatrix, file = "../../data/rankedAttributes/GDCrowVars.csv", row.names = FALSE)
