@@ -1,6 +1,7 @@
-import configparser, glob
+import configparser, glob, time
 
 from disgenet.disgenet_python3 import main
+from disgenet.mapToEnsemblIds import mapToEnsemblIds
 from disgenet.replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
 from disgenet.interleaveGeneLists import interleaveGeneLists
 from disgenet.mergeTopGeneLists import mergeTopGeneLists
@@ -12,16 +13,20 @@ def executePipeline():
 
     config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation = readConfig()
 
+    df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
+
+    begin_timestamp = time.time()
+
     # retrieve gene disease associations for each disease and save in a separate file
-    main("diseases_UMLS_codes.txt",config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
+    main(config["dataLocations"]["disgenetDiseaseCodesLocation"],config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
+
+    mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'])
 
     # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
     selectTopGenesPerDisease(config['dataLocations']['geneDiseaseAssociationsLocation'],
                              config['selection'].getboolean("useThreshold"),
                              config['selection']['threshold'],
                              config['selection']['topK'])
-
-    df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
 
     if int(config['pipeline']['interleave']) == 2:
 
@@ -47,6 +52,10 @@ def executePipeline():
         interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
 
         saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
+
+        end_timestamp = time.time()
+
+        print("elapsed time: %f" % (end_timestamp - begin_timestamp))
 
     else:
 
