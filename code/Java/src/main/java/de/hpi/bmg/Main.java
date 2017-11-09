@@ -42,7 +42,7 @@ public class Main {
 
 
         //String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain", "disgenetTop15", "disgenetTop25"};
-        String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain"};
+        String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain", "rowVars"};
 
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
