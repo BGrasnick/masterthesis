@@ -1,7 +1,7 @@
 library(genefilter)
 library(tictoc)
 
-rawData <- read.csv("../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts_WithDiseaseCodes.csv")
+rawData <- read.csv("../../data/GDC/TCGA-PRAD_TCGA-OV_TCGA-COAD_TCGA-LUSC_TCGA-BRCA_TCGA-PAAD_TCGA-STAD_TCGA-CESC__GeneExpressionQuantification_TP_HTSeq-Counts_WithDiseaseCodes.csv")
 
 tic("total")
 
@@ -25,4 +25,4 @@ colnames(orderedNameValueMatrix) <- c("attributeName", "value", "index")
 
 toc()
 
-write.csv(orderedNameValueMatrix, file = "../../data/rankedAttributes/GDCrowVars.csv", row.names = FALSE)
+write.csv(orderedNameValueMatrix, file = "../../data/rankedAttributes/GDCbad/rowVars.csv", row.names = FALSE)
