@@ -20,13 +20,25 @@ def executePipeline():
     # retrieve gene disease associations for each disease and save in a separate file
     main(config["dataLocations"]["disgenetDiseaseCodesLocation"],config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
 
+    postfetching_timestamp = time.time()
+
+    print("fetching time: %f" % (postfetching_timestamp - begin_timestamp))
+
     mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'])
+
+    mapping_timestamp = time.time()
+
+    print("ensembl mapping time: %f" % (mapping_timestamp - postfetching_timestamp))
 
     # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
     selectTopGenesPerDisease(config['dataLocations']['geneDiseaseAssociationsLocation'],
                              config['selection'].getboolean("useThreshold"),
                              config['selection']['threshold'],
                              config['selection']['topK'])
+
+    topSelection_timestamp = time.time()
+
+    print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
 
     if int(config['pipeline']['interleave']) == 2:
 
@@ -44,6 +56,10 @@ def executePipeline():
 
             replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
 
+        geneNameReplacement_timestamp = time.time()
+
+        print("replaced gene names time: %f" % (geneNameReplacement_timestamp - topSelection_timestamp))
+
         # load single files in folder replaced for interleaving
         newPath = path.split("/")
         newPath[5] = "replaced"
@@ -51,11 +67,15 @@ def executePipeline():
         # interleave gene names from the different disease files
         interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
 
+        interleave_timestamp = time.time()
+
+        print("interleaved gene names time: %f" % (interleave_timestamp - geneNameReplacement_timestamp))
+
         saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
 
         end_timestamp = time.time()
 
-        print("elapsed time: %f" % (end_timestamp - begin_timestamp))
+        print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
     else:
 
