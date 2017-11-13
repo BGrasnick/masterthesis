@@ -49,7 +49,7 @@ def executePipeline():
         for fname in glob.glob(path):
             tupleList = loadTupleList(fname)
             newTupleList = addDatasetIndicesToDisgenetGenes(tupleList, df)
-            saveTupleList(newTupleList, fname)
+            saveTupleList(fname, newTupleList)
 
         addingIndices_timestamp = time.time()
 
