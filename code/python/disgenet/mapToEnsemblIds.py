@@ -1,6 +1,5 @@
 import glob, pdb
 import pandas as pd
-from collections import defaultdict
 
 
 def mapToEnsemblIds(geneDiseaseAssociationsLocation, uniProtToEnsemblMap):
