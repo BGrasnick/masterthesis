@@ -15,6 +15,8 @@ def executePipeline():
 
     df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
 
+    uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
+
     begin_timestamp = time.time()
 
     # retrieve gene disease associations for each disease and save in a separate file
@@ -24,11 +26,13 @@ def executePipeline():
 
     print("fetching time: %f" % (postfetching_timestamp - begin_timestamp))
 
-    mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'])
+    if config["pipeline"]["dataset"] == "GDC":
 
-    mapping_timestamp = time.time()
+        mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'], uniProtToEnsemblMap)
 
-    print("ensembl mapping time: %f" % (mapping_timestamp - postfetching_timestamp))
+        mapping_timestamp = time.time()
+
+        print("mapping ensembl Ids time: %f" % (mapping_timestamp - postfetching_timestamp))
 
     # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
     selectTopGenesPerDisease(config['dataLocations']['geneDiseaseAssociationsLocation'],
@@ -38,27 +42,33 @@ def executePipeline():
 
     topSelection_timestamp = time.time()
 
-    print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
+    if config["pipeline"]["dataset"] == "GDC":
+        print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
+
+    else:
+        print("selecting top genes time: %f" % (topSelection_timestamp - postfetching_timestamp))
 
     if int(config['pipeline']['interleave']) == 2:
 
-        # replace gene names in files from all the different diseases with the ones in the dataset
-        for fname in glob.glob(path):
+        if config["pipeline"]["dataset"] == "TCGA":
 
-            # put in single files in folder replaced to use later on for interleaving
-            newLocation = fname.split("/")
-            newLocation[5] = "replaced"
+            # replace gene names in files from all the different diseases with the ones in the dataset
+            for fname in glob.glob(path):
 
-            tupleList = loadTupleList(fname)
+                    # put in single files in folder replaced to use later on for interleaving
+                    newLocation = fname.split("/")
+                    newLocation[5] = "replaced"
 
-            # get rid of the header
-            tupleList.pop(0)
+                    tupleList = loadTupleList(fname)
 
-            replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
+                    # get rid of the header
+                    tupleList.pop(0)
 
-        geneNameReplacement_timestamp = time.time()
+                    replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
 
-        print("replaced gene names time: %f" % (geneNameReplacement_timestamp - topSelection_timestamp))
+            geneNameReplacement_timestamp = time.time()
+
+            print("replaced gene names time: %f" % (geneNameReplacement_timestamp - topSelection_timestamp))
 
         # load single files in folder replaced for interleaving
         newPath = path.split("/")
@@ -69,7 +79,10 @@ def executePipeline():
 
         interleave_timestamp = time.time()
 
-        print("interleaved gene names time: %f" % (interleave_timestamp - geneNameReplacement_timestamp))
+        if config["pipeline"]["dataset"] == "TCGA":
+            print("interleaved gene names time: %f" % (interleave_timestamp - geneNameReplacement_timestamp))
+        else:
+            print("interleaved gene names time: %f" % (interleave_timestamp - topSelection_timestamp))
 
         saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
 
@@ -95,6 +108,17 @@ def executePipeline():
         # find top genes from disgenet in the gene expression data by matching names and save together with score and index
         replaceDisgenetWithDatasetGeneNames(topGeneList, genesWithReplacedNamesLocation, df, config["filtering"]["geneNameSeparator"])
 
+def loadUniProtToEnsemblMap(uniprotToEnsemblMapLocation):
+    uniprotToEnsemblMap = dict()
+    with open(uniprotToEnsemblMapLocation, 'r') as csvfile:
+        uniProtToEnsemblReader = csv.reader(csvfile, delimiter='\t')
+        for uniprot, ensembl, ensemblId in uniProtToEnsemblReader:
+            if uniprot in uniprotToEnsemblMap.keys():
+                uniprotToEnsemblMap[uniprot].append(ensemblId)
+            else:
+                uniprotToEnsemblMap[uniprot] = [ensemblId]
+
+    return uniprotToEnsemblMap
 
 def readConfig():
     config = configparser.ConfigParser()
