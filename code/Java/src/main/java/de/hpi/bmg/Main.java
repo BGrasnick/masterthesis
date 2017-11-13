@@ -34,15 +34,15 @@ public class Main {
 
         //LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with methods: " + String.join(",",attributeSelectionMethods));
 
-        for (String asMethod : attributeSelectionMethods) {
+        /*for (String asMethod : attributeSelectionMethods) {
             selectAttributes(data, asMethod, prop.getProperty("attributeRankingOutputFile"));
-        }
+        }*/
 
         //LOGGER.info(getCurrentTimestamp() + ": Finished attribute selection with methods: " + String.join(",",attributeSelectionMethods));
 
 
         //String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain", "disgenetTop15", "disgenetTop25"};
-        String[] allMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain", "rowVars"};
+        String[] allMethods = {"random","random2"};
 
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
