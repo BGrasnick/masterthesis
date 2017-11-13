@@ -1,12 +1,12 @@
 import configparser, glob, time
 
-from disgenet.addDatasetIndicesToDisgenetGenes import addDatasetIndicesToDisgenetGenes
-from disgenet.disgenet_python3 import main
-from disgenet.mapToEnsemblIds import mapToEnsemblIds
-from disgenet.replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
-from disgenet.interleaveGeneLists import interleaveGeneLists
-from disgenet.mergeTopGeneLists import mergeTopGeneLists
-from disgenet.selectTopGenesPerDisease import selectTopGenesPerDisease
+from addDatasetIndicesToDisgenetGenes import addDatasetIndicesToDisgenetGenes
+from disgenet_python3 import main
+from mapToEnsemblIds import mapToEnsemblIds
+from replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
+from interleaveGeneLists import interleaveGeneLists
+from mergeTopGeneLists import mergeTopGeneLists
+from selectTopGenesPerDisease import selectTopGenesPerDisease
 import pandas as pd
 import csv
 
@@ -14,7 +14,7 @@ def executePipeline():
 
     config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation = readConfig()
 
-    df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
+    #df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
 
     uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
 
@@ -74,7 +74,7 @@ def executePipeline():
                     # get rid of the header
                     tupleList.pop(0)
 
-                    replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
+                    #replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
 
             geneNameReplacement_timestamp = time.time()
 
