@@ -1,5 +1,6 @@
 import configparser, glob, time
 
+from disgenet.addDatasetIndicesToDisgenetGenes import addDatasetIndicesToDisgenetGenes
 from disgenet.disgenet_python3 import main
 from disgenet.mapToEnsemblIds import mapToEnsemblIds
 from disgenet.replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
@@ -45,6 +46,15 @@ def executePipeline():
     if config["pipeline"]["dataset"] == "GDC":
         print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
 
+        for fname in glob.glob(path):
+            tupleList = loadTupleList(fname)
+            newTupleList = addDatasetIndicesToDisgenetGenes(tupleList, df)
+            saveTupleList(newTupleList, fname)
+
+        addingIndices_timestamp = time.time()
+
+        print("adding indices time: %f" % (addingIndices_timestamp - topSelection_timestamp))
+
     else:
         print("selecting top genes time: %f" % (topSelection_timestamp - postfetching_timestamp))
 
@@ -70,19 +80,24 @@ def executePipeline():
 
             print("replaced gene names time: %f" % (geneNameReplacement_timestamp - topSelection_timestamp))
 
-        # load single files in folder replaced for interleaving
-        newPath = path.split("/")
-        newPath[5] = "replaced"
+            # load single files in folder replaced for interleaving
+            newPath = path.split("/")
+            newPath[5] = "replaced"
 
-        # interleave gene names from the different disease files
-        interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
+            # interleave gene names from the different disease files
+            interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
 
-        interleave_timestamp = time.time()
+            interleave_timestamp = time.time()
 
-        if config["pipeline"]["dataset"] == "TCGA":
             print("interleaved gene names time: %f" % (interleave_timestamp - geneNameReplacement_timestamp))
+
         else:
-            print("interleaved gene names time: %f" % (interleave_timestamp - topSelection_timestamp))
+            # interleave gene names from the different disease files
+            interleavedTopGeneList = interleaveGeneLists(path)
+
+            interleave_timestamp = time.time()
+
+            print("interleaved gene names time: %f" % (interleave_timestamp - addingIndices_timestamp))
 
         saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
 
