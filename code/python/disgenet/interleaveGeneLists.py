@@ -25,8 +25,6 @@ def interleaveGeneLists(path):
 
     # calculate all the lengths of gene lists to get the all genes even from the longest list later on
     lengths = [len(geneList) for geneList in listOfGeneLists]
-	
-    pdb.set_trace()
 
     for index in range(max(lengths)):
 
