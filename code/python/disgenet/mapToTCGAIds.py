@@ -2,8 +2,11 @@ import operator
 
 import pandas as pd
 import csv, os
+from utils import createOrClearDirectory
 
 def mapToTCGAIds(geneDiseaseAssociationsLocation, postIdMappingLocation, featureNames, geneNameSeparator, useThreshold, threshold, topK):
+
+    createOrClearDirectory(postIdMappingLocation)
 
     splitGeneNames = [geneName.split(geneNameSeparator)[0] for geneName in featureNames]
 

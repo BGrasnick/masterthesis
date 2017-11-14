@@ -1,8 +1,11 @@
 import os
 import pandas as pd
+from utils import createOrClearDirectory
 
 
 def mapToEnsemblIds(geneDiseaseAssociationsLocation, postIdMappingLocation, uniProtToEnsemblMap, featureNames):
+
+    createOrClearDirectory(postIdMappingLocation)
 
     for fname in os.listdir(geneDiseaseAssociationsLocation):
 
