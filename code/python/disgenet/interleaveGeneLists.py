@@ -1,4 +1,4 @@
-import operator, glob, pdb
+import operator, os
 
 import pandas as pd
 
@@ -9,8 +9,9 @@ def interleaveGeneLists(path):
     listOfGeneLists = []
 
     # loop through all files in the selected top genes location
-    for fname in glob.glob(path):
-        df = pd.read_csv(fname)
+    for fname in os.listdir(path):
+
+        df = pd.read_csv(os.path.join(path, fname))
 
         # load geneList as list of tuples
         geneList = [tuple(x) for x in df.to_records(index=False)]

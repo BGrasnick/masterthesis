@@ -1,13 +1,12 @@
-import glob, pdb
+import os
 import pandas as pd
 
 
-def mapToEnsemblIds(geneDiseaseAssociationsLocation, uniProtToEnsemblMap):
+def mapToEnsemblIds(geneDiseaseAssociationsLocation, postIdMappingLocation, uniProtToEnsemblMap, featureNames):
 
-    path = geneDiseaseAssociationsLocation + "*.tsv"
+    for fname in os.listdir(geneDiseaseAssociationsLocation):
 
-    for fname in glob.glob(path):
-        df = pd.read_csv(fname, sep='\t')
+        df = pd.read_csv(os.path.join(geneDiseaseAssociationsLocation, fname), sep='\t')
 
         # look if there are multiple uniprotIds per entries and replicate rows
         df_times = df["c2.uniprotId"].str.count(";") + 1
@@ -30,7 +29,6 @@ def mapToEnsemblIds(geneDiseaseAssociationsLocation, uniProtToEnsemblMap):
 
                 df.at[index,"c2.uniprotId"] = elem["c2.uniprotId"].split(";")[lastIdx].replace(".","")
                 lastIdx += 1
-
 
         indexes_to_drop = []
 
@@ -62,6 +60,8 @@ def mapToEnsemblIds(geneDiseaseAssociationsLocation, uniProtToEnsemblMap):
         lastUniprotId = ""
         lastIdx = 0
 
+        datasetIdColumn = []
+
         # replace the duplicated ensemblIds with ascending single Ids
         for index, elem in df.iterrows():
 
@@ -74,10 +74,20 @@ def mapToEnsemblIds(geneDiseaseAssociationsLocation, uniProtToEnsemblMap):
                 df.at[index,"c2.symbol"] = elem["c2.symbol"].split(";")[lastIdx].replace(".","")
                 lastIdx += 1
 
+            # look if the ensemblId exists in the dataset and if so add it's id to the datasetIdColumn
+            if elem["c2.symbol"] in featureNames:
+                datasetIdColumn.append(featureNames.index(elem["c2.symbol"]))
+            else:
+                datasetIdColumn.append(-1)
+
+        df.insert(0, column="datasetIdColumn", value=datasetIdColumn)
+
+        # filter entries by the existence of their ensemblId in the dataset and only retain important columns
+        df = df[df["datasetIdColumn"] != -1][["c2.symbol", "c0.score", "datasetIdColumn", "c1.diseaseId"]]
 
         # sort and drop duplicate ensemblIds
         df = df.sort_values('c0.score', ascending=False)
 
         df = df.drop_duplicates(subset="c2.symbol")
 
-        df.to_csv(fname,  index=False, sep="\t")
+        df.to_csv(postIdMappingLocation + fname.split("/")[-1],  index=False, sep="\t")

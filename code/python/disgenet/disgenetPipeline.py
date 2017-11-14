@@ -1,27 +1,26 @@
-import configparser, glob, time
+import configparser, time
 
-from addDatasetIndicesToDisgenetGenes import addDatasetIndicesToDisgenetGenes
 from disgenet_python3 import main
 from mapToEnsemblIds import mapToEnsemblIds
-from replaceDisgenetWithDatasetGeneNames import replaceDisgenetWithDatasetGeneNames
+from mapToTCGAIds import mapToTCGAIds
 from interleaveGeneLists import interleaveGeneLists
 from mergeTopGeneLists import mergeTopGeneLists
 from selectTopGenesPerDisease import selectTopGenesPerDisease
-import pandas as pd
-import csv
+import csv, sys
 
 def executePipeline():
 
-    config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation = readConfig()
+    config, selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation = readConfig()
 
-    #df = pd.read_csv(config["dataLocations"]["geneExpressionDataLocation"])
+    featureNames = loadFeatureNames(config["dataLocations"]["geneExpressionDataLocation"])
 
-    uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
+    if config["pipeline"]["dataset"] == "GDC":
+        uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
 
     begin_timestamp = time.time()
 
     # retrieve gene disease associations for each disease and save in a separate file
-    main(config["dataLocations"]["disgenetDiseaseCodesLocation"],config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
+    main(config["dataLocations"]["disgenetDiseaseCodesLocation"], config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
 
     postfetching_timestamp = time.time()
 
@@ -29,99 +28,61 @@ def executePipeline():
 
     if config["pipeline"]["dataset"] == "GDC":
 
-        mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'], uniProtToEnsemblMap)
+        mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'], config["dataLocations"]["postIdMappingLocation"], uniProtToEnsemblMap, featureNames)
 
-        mapping_timestamp = time.time()
+    elif config["pipeline"]["dataset"] == "TCGA":
 
-        print("mapping ensembl Ids time: %f" % (mapping_timestamp - postfetching_timestamp))
+        mapToTCGAIds(config['dataLocations']['geneDiseaseAssociationsLocation'],
+                     config["dataLocations"]["postIdMappingLocation"], featureNames,
+                     config["filtering"]["geneNameSeparator"], config['selection'].getboolean("useThreshold"),
+                     config['selection']['threshold'], config['selection']['topK'])
+
+    mapping_timestamp = time.time()
+
+    print("mapping ensembl Ids time: %f" % (mapping_timestamp - postfetching_timestamp))
 
     # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
-    selectTopGenesPerDisease(config['dataLocations']['geneDiseaseAssociationsLocation'],
+    selectTopGenesPerDisease(config['dataLocations']['postIdMappingLocation'],
+                             selectedGenesPath,
                              config['selection'].getboolean("useThreshold"),
                              config['selection']['threshold'],
                              config['selection']['topK'])
 
     topSelection_timestamp = time.time()
 
-    if config["pipeline"]["dataset"] == "GDC":
-        print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
-
-        for fname in glob.glob(path):
-            tupleList = loadTupleList(fname)
-            newTupleList = addDatasetIndicesToDisgenetGenes(tupleList, df)
-            saveTupleList(fname, newTupleList)
-
-        addingIndices_timestamp = time.time()
-
-        print("adding indices time: %f" % (addingIndices_timestamp - topSelection_timestamp))
-
-    else:
-        print("selecting top genes time: %f" % (topSelection_timestamp - postfetching_timestamp))
+    print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
 
     if int(config['pipeline']['interleave']) == 2:
 
-        if config["pipeline"]["dataset"] == "TCGA":
+        # interleave gene names from the different disease files
+        interleavedTopGeneList = interleaveGeneLists(selectedGenesPath)
 
-            # replace gene names in files from all the different diseases with the ones in the dataset
-            for fname in glob.glob(path):
+        interleave_timestamp = time.time()
 
-                    # put in single files in folder replaced to use later on for interleaving
-                    newLocation = fname.split("/")
-                    newLocation[5] = "replaced"
-
-                    tupleList = loadTupleList(fname)
-
-                    # get rid of the header
-                    tupleList.pop(0)
-
-                    #replaceDisgenetWithDatasetGeneNames(tupleList, "/".join(newLocation), df, config["filtering"]["geneNameSeparator"])
-
-            geneNameReplacement_timestamp = time.time()
-
-            print("replaced gene names time: %f" % (geneNameReplacement_timestamp - topSelection_timestamp))
-
-            # load single files in folder replaced for interleaving
-            newPath = path.split("/")
-            newPath[5] = "replaced"
-
-            # interleave gene names from the different disease files
-            interleavedTopGeneList = interleaveGeneLists("/".join(newPath))
-
-            interleave_timestamp = time.time()
-
-            print("interleaved gene names time: %f" % (interleave_timestamp - geneNameReplacement_timestamp))
-
-        else:
-            # interleave gene names from the different disease files
-            interleavedTopGeneList = interleaveGeneLists(path)
-
-            interleave_timestamp = time.time()
-
-            print("interleaved gene names time: %f" % (interleave_timestamp - addingIndices_timestamp))
-
-        saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
+        print("interleaved gene names time: %f" % (interleave_timestamp - topSelection_timestamp))
 
         end_timestamp = time.time()
 
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
+        saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
+
     else:
 
-        topGeneList = []
+        # merge the top genes from different diseases into one list without duplicates
+        topGeneList = mergeTopGeneLists(selectedGenesPath, config['selection'].getboolean("useThreshold"),
+                                        config['selection']['threshold'],
+                                        config['selection']['topK'])
 
-        if int(config['pipeline']['interleave']) == 0:
-            # merge the top genes from different diseases into one list without duplicates
-            topGeneList = mergeTopGeneLists(path, config['selection'].getboolean("useThreshold"),
-                                    config['selection']['threshold'],
-                                    config['selection']['topK'])
+        merge_timestamp = time.time()
 
-        elif int(config['pipeline']['interleave']) == 1:
+        print("merge gene names time: %f" % (merge_timestamp - topSelection_timestamp))
 
-            # interleave the gene names from the merged disease file
-            topGeneList = interleaveGeneLists(path)
+        end_timestamp = time.time()
 
-        # find top genes from disgenet in the gene expression data by matching names and save together with score and index
-        replaceDisgenetWithDatasetGeneNames(topGeneList, genesWithReplacedNamesLocation, df, config["filtering"]["geneNameSeparator"])
+        print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
+
+        saveTupleList(genesWithReplacedNamesLocation, topGeneList)
 
 def loadUniProtToEnsemblMap(uniprotToEnsemblMapLocation):
     uniprotToEnsemblMap = dict()
@@ -135,14 +96,24 @@ def loadUniProtToEnsemblMap(uniprotToEnsemblMapLocation):
 
     return uniprotToEnsemblMap
 
+def loadFeatureNames(geneExpressionDataLocation):
+
+    csv.field_size_limit(sys.maxsize)
+
+    with open(geneExpressionDataLocation, 'r') as csvfile:
+        geneExpressionDataReader = csv.reader(csvfile, delimiter=',')
+        featureNames = next(geneExpressionDataReader)
+
+    return featureNames
+
 def readConfig():
     config = configparser.ConfigParser()
     config.read('config.ini')
 
     if config['selection'].getboolean("useThreshold"):
 
-        path = "../../../data/disgenet/selectedThreshold" + str(config['selection']['threshold']) \
-            .replace(".", "") + "/*.tsv"
+        selectedGenesPath = "../../../data/disgenet/selectedThreshold" + str(config['selection']['threshold']) \
+            .replace(".", "") + "/"
 
         mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Threshold" + \
                                  str(config['selection']['threshold']).replace(".", "") + ".csv"
@@ -152,7 +123,7 @@ def readConfig():
 
     else:
 
-        path = "../../../data/disgenet/selectedTop" + str(config['selection']['topK']) + "/*.tsv"
+        selectedGenesPath = "../../../data/disgenet/selectedTop" + str(config['selection']['topK']) + "/"
 
         mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Top" + \
                                  str(config['selection']['topK']) + ".csv"
@@ -160,8 +131,7 @@ def readConfig():
         genesWithReplacedNamesLocation = config['dataLocations']['rankedGeneNameList'] + "Top" + \
                                      str(config['selection']['topK']) + ".csv"
 
-    return config, path, mergedTopGenesLocation, genesWithReplacedNamesLocation
-
+    return config, selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation
 
 def saveTupleList(fileName, tupleList):
     with open(fileName, "w") as csvfile:
@@ -172,7 +142,6 @@ def saveTupleList(fileName, tupleList):
         for tup in tupleList:
 
             csvWriter.writerow(list(tup))
-
 
 def loadTupleList(fileName):
 

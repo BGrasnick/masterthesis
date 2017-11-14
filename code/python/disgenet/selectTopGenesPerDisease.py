@@ -1,40 +1,34 @@
 import pandas as pd
-import glob, os
+import os
 
-def selectTopGenesPerDisease(geneDiseaseAssociationsLocation, useThreshold, threshold, topK):
-
-    path = geneDiseaseAssociationsLocation + "*.tsv"
+def selectTopGenesPerDisease(postIdMappingLocation, selectedGenesPath, useThreshold, threshold, topK):
 
     # loop through all files in the gene disease assocation location
-    for fname in glob.glob(path):
-        df = pd.read_csv(fname, sep='\t')
+    for fname in os.listdir(postIdMappingLocation):
+
+        df = pd.read_csv(os.path.join(postIdMappingLocation, fname), sep='\t')
+
         df.sort_values('c0.score', ascending = False)
 
         # split by directories in order to put results in new directory
-        newNameList = fname.split("/")
+        newName = selectedGenesPath + fname.split("/")[-1]
 
         # filter using either a threshold or a topK approach
         if useThreshold:
-            # add selectThreshold and the threshold as a directory
-            newNameList.insert(-1,'selectedThreshold'  + str(threshold).replace(".",""))
-            newName = "/".join(newNameList)
 
             # create directory if not already existing
-            if not os.path.isdir("/".join(newNameList[0:-1])):
-                os.makedirs("/".join(newNameList[0:-1]))
+            if not os.path.isdir("/".join(newName.split("/")[:-1])):
+                os.makedirs("/".join(newName.split("/")[:-1]))
 
             # filter entries using the threshold and save
-            df[df["c0.score"] >= float(threshold)][["c2.symbol", "c0.score", "c1.diseaseId"]].to_csv(newName, index=False)
+            df[df["c0.score"] >= float(threshold)].to_csv(newName, index=False)
 
         else:
-            # add selectTop and the k as a directory
-            newNameList.insert(-1,'selectedTop' + str(topK))
-            newName = "/".join(newNameList)
 
             # create directory if not already existing
-            if not os.path.isdir("/".join(newNameList[0:-1])):
-                os.makedirs("/".join(newNameList[0:-1]))
+            if not os.path.isdir("/".join(newName.split("/")[:-1])):
+                os.makedirs("/".join(newName.split("/")[:-1]))
 
             # only retain the top k entries and save
-            df[0:int(topK)][["c2.symbol", "c0.score", "c1.diseaseId"]].to_csv(newName, index=False)
+            df[0:int(topK)].to_csv(newName, index=False)
 

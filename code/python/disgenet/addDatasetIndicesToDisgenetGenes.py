@@ -1,9 +1,9 @@
-def addDatasetIndicesToDisgenetGenes(topGeneList, df):
+def addDatasetIndicesToDisgenetGenes(topGeneList, featureNames):
 
-    outputList = [("attributeName", "score", "index", "diseaseId")]
+    outputList = []
 
     for tup in topGeneList:
-        if tup[0] in df.columns:
-            outputList.append((tup[0], tup[1], df.columns.get_loc(tup[0]) - 1, tup[2]))
+        if tup[0] in featureNames:
+            outputList.append((tup[0], tup[1], featureNames.index(tup[0]), tup[2]))
 
     return outputList
