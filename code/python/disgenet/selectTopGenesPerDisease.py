@@ -4,6 +4,8 @@ from utils import createOrClearDirectory
 
 def selectTopGenesPerDisease(postIdMappingLocation, selectedGenesPath, useThreshold, threshold, topK):
 
+    createOrClearDirectory(selectedGenesPath)
+
     # loop through all files in the gene disease assocation location
     for fname in os.listdir(postIdMappingLocation):
 
@@ -13,8 +15,6 @@ def selectTopGenesPerDisease(postIdMappingLocation, selectedGenesPath, useThresh
 
         # split by directories in order to put results in new directory
         newName = selectedGenesPath + fname.split("/")[-1]
-
-        createOrClearDirectory("/".join(newName.split("/")[:-1]))
 
         # filter using either a threshold or a topK approach
         if useThreshold:
