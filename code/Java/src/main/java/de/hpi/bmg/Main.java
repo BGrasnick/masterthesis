@@ -30,7 +30,11 @@ public class Main {
 
         data.setClassIndex(0);
 
-        String[] attributeSelectionMethods = {"ReliefF", "SVM-RFE", "GainRatio", "InfoGain"};
+        String[] attributeSelectionMethods = {"InfoGain", "SVM-RFE", "ReliefF"};
+
+        RuntimeMeasurer rm = new RuntimeMeasurer(data, prop.getProperty("runTimeMeasurementOutput"), attributeSelectionMethods);
+
+        rm.measureRuntimes(10);
 
         //LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with methods: " + String.join(",",attributeSelectionMethods));
 
@@ -47,12 +51,12 @@ public class Main {
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
         //LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
-
+        /*
         for (String asMethod : allMethods) {
             classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", prop.getProperty("resultLocation") + asMethod + ".csv", ce,
                     Integer.parseInt(prop.getProperty("topKmin")), Integer.parseInt(prop.getProperty("topKmax")));
         }
-
+        */
         //LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k from " + prop.getProperty("topKmin") + " to " + prop.getProperty("topKmax"));
 
         //selectAttributes(data, prop.getProperty("attributeSelection"), prop.getProperty("attributeRankingOutputFile"));
