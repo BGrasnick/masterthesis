@@ -18,73 +18,80 @@ def executePipeline():
     if config["pipeline"]["dataset"] == "GDC":
         uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
 
-    begin_timestamp = time.time()
 
-    # retrieve gene disease associations for each disease and save in a separate file
-    createOrClearDirectory(config["dataLocations"]["geneDiseaseAssociationsLocation"])
-    main(config["dataLocations"]["disgenetDiseaseCodesLocation"], config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
+    for i in range(10):
+        print("disgenet")
+        for j in range(10):
 
-    postfetching_timestamp = time.time()
+            begin_timestamp = time.time()
 
-    print("fetching time: %f" % (postfetching_timestamp - begin_timestamp))
+            # retrieve gene disease associations for each disease and save in a separate file
+            createOrClearDirectory(config["dataLocations"]["geneDiseaseAssociationsLocation"])
+            main(config["dataLocations"]["disgenetDiseaseCodesLocation"], config["dataLocations"]["geneDiseaseAssociationsLocation"], "disease", "cui")
 
-    if config["pipeline"]["dataset"] == "GDC":
+            #postfetching_timestamp = time.time()
 
-        mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'], config["dataLocations"]["postIdMappingLocation"], uniProtToEnsemblMap, featureNames)
+            #print("fetching time: %f" % (postfetching_timestamp - begin_timestamp))
 
-    elif config["pipeline"]["dataset"] == "TCGA":
+            if config["pipeline"]["dataset"] == "GDC":
 
-        mapToTCGAIds(config['dataLocations']['geneDiseaseAssociationsLocation'],
-                     config["dataLocations"]["postIdMappingLocation"], featureNames,
-                     config["filtering"]["geneNameSeparator"], config['selection'].getboolean("useThreshold"),
-                     config['selection']['threshold'], config['selection']['topK'])
+                mapToEnsemblIds(config['dataLocations']['geneDiseaseAssociationsLocation'],
+                                config["dataLocations"]["postIdMappingLocation"], uniProtToEnsemblMap,
+                                featureNames, config["pipeline"]["useAllUniprotIds"], config["pipeline"]["useAllEnsemblIds"])
 
-    mapping_timestamp = time.time()
+            elif config["pipeline"]["dataset"] == "TCGA":
 
-    print("mapping ensembl Ids time: %f" % (mapping_timestamp - postfetching_timestamp))
+                mapToTCGAIds(config['dataLocations']['geneDiseaseAssociationsLocation'],
+                             config["dataLocations"]["postIdMappingLocation"], featureNames,
+                             config["filtering"]["geneNameSeparator"], config['selection'].getboolean("useThreshold"),
+                             config['selection']['threshold'], config['selection']['topK'])
 
-    # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
-    selectTopGenesPerDisease(config['dataLocations']['postIdMappingLocation'],
-                             selectedGenesPath,
-                             config['selection'].getboolean("useThreshold"),
-                             config['selection']['threshold'],
-                             config['selection']['topK'])
+            #mapping_timestamp = time.time()
 
-    topSelection_timestamp = time.time()
+            #print("mapping ensembl Ids time: %f" % (mapping_timestamp - postfetching_timestamp))
 
-    print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
+            # select the top genes per disease that are either over a specified threshold or the top k and save in separate files
+            selectTopGenesPerDisease(config['dataLocations']['postIdMappingLocation'],
+                                     selectedGenesPath,
+                                     config['selection'].getboolean("useThreshold"),
+                                     config['selection']['threshold'],
+                                     config['selection']['topK'])
 
-    if int(config['pipeline']['interleave']) == 2:
+            #topSelection_timestamp = time.time()
 
-        # interleave gene names from the different disease files
-        interleavedTopGeneList = interleaveGeneLists(selectedGenesPath)
+            #print("selecting top genes time: %f" % (topSelection_timestamp - mapping_timestamp))
 
-        interleave_timestamp = time.time()
+            if int(config['pipeline']['interleave']) == 2:
 
-        print("interleaved gene names time: %f" % (interleave_timestamp - topSelection_timestamp))
+                # interleave gene names from the different disease files
+                interleavedTopGeneList = interleaveGeneLists(selectedGenesPath)
 
-        end_timestamp = time.time()
+                #interleave_timestamp = time.time()
 
-        print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
+                #print("interleaved gene names time: %f" % (interleave_timestamp - topSelection_timestamp))
 
-        saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
+                end_timestamp = time.time()
 
-    else:
+                print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
-        # merge the top genes from different diseases into one list without duplicates
-        topGeneList = mergeTopGeneLists(selectedGenesPath, config['selection'].getboolean("useThreshold"),
-                                        config['selection']['threshold'],
-                                        config['selection']['topK'])
+                #saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
 
-        merge_timestamp = time.time()
+            else:
 
-        print("merge gene names time: %f" % (merge_timestamp - topSelection_timestamp))
+                # merge the top genes from different diseases into one list without duplicates
+                topGeneList = mergeTopGeneLists(selectedGenesPath, config['selection'].getboolean("useThreshold"),
+                                                config['selection']['threshold'],
+                                                config['selection']['topK'])
 
-        end_timestamp = time.time()
+                #merge_timestamp = time.time()
 
-        print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
+                #print("merge gene names time: %f" % (merge_timestamp - topSelection_timestamp))
 
-        saveTupleList(genesWithReplacedNamesLocation, topGeneList)
+                end_timestamp = time.time()
+
+                print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
+
+                #saveTupleList(genesWithReplacedNamesLocation, topGeneList)
 
 if __name__ == '__main__':
 
