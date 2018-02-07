@@ -11,8 +11,8 @@ onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 
 for first, second in list(itertools.combinations(onlyfiles, 2)):
 
-    firstRanking = pd.read_csv('../../../data/rankedAttributes/' + first)
-    secondRanking = pd.read_csv('../../../data/rankedAttributes/' + second)
+    firstRanking = pd.read_csv(path + first)
+    secondRanking = pd.read_csv(path + second)
 
     percentageOverlap = len(set(firstRanking["attributeName"].head(topK).tolist())
                             .intersection(secondRanking["attributeName"].head(topK).tolist())) / topK
