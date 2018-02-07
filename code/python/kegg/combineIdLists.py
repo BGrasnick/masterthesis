@@ -1,11 +1,12 @@
-pathwayFile = open('ensemblIdListWithGeneralPathways.txt', 'r')
-pathwayIdList = pathwayFile.readlines()
+from utils import writeSetToFile
 
-diseaseFile = open('ensemblIdListDiseases.txt', 'r')
-diseaseIdList = diseaseFile.readlines()
+import pdb
 
-combined = set(pathwayIdList).union(set(diseaseIdList))
+def combineIdLists(firstListLocation, secondListLocation, combinedListLocation):
 
-outputFile = open('combinedIdsWithGeneralPathways.txt', 'w')
-for item in combined:
-    outputFile.write("%s" % item)
+    firstIdList = [line.rstrip() for line in open(firstListLocation)]
+    secondIdList = [line.rstrip() for line in open(secondListLocation)]
+
+    combined = set(firstIdList).union(set(secondIdList))
+
+    writeSetToFile(combined, combinedListLocation)
