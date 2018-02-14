@@ -28,26 +28,35 @@ public class ClassificationEvaluator {
         try {
             eval = new Evaluation(newData);
 
+            double sum = 0.0d;
+
             SMO smo = new SMO();
             eval.crossValidateModel(smo, newData, 10, new Random(1));
             returnString += "," + eval.pctCorrect();
+            sum += eval.pctCorrect();
 
             Logistic lr = new Logistic();
             eval.crossValidateModel(lr, newData, 10, new Random(1));
             returnString += "," + eval.pctCorrect();
+            sum += eval.pctCorrect();
 
             NaiveBayes nb = new NaiveBayes();
             eval.crossValidateModel(nb, newData, 10, new Random(1));
             returnString += "," + eval.pctCorrect();
+            sum += eval.pctCorrect();
 
             IBk knn = new IBk();
             knn.setKNN(3);
             eval.crossValidateModel(knn, newData, 10, new Random(1));
             returnString += "," + eval.pctCorrect();
+            sum += eval.pctCorrect();
 
             knn.setKNN(5);
             eval.crossValidateModel(knn, newData, 10, new Random(1));
             returnString += "," + eval.pctCorrect();
+            sum += eval.pctCorrect();
+
+            returnString += "," + (sum/5.0d);
 
             //System.out.println(eval.toSummaryString(true));
 

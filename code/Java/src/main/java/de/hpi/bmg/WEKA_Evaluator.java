@@ -3,11 +3,10 @@ package de.hpi.bmg;
 import com.opencsv.CSVWriter;
 import weka.core.Instances;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class WEKA_Evaluator {
@@ -16,9 +15,7 @@ public class WEKA_Evaluator {
 
     public static void main(String[] args) {
 
-        Properties prop = Utils.loadProperties("config.properties");
-
-        DataLoader dl = new DataLoader(args[1]);
+        DataLoader dl = new DataLoader(args[0]);
 
         Instances data = dl.getData();
 
@@ -26,17 +23,16 @@ public class WEKA_Evaluator {
 
         data.setClassIndex(0);
 
-        List<String> attributeSelectionMethods = new ArrayList<String>();
-
-        for (int i=2; i < args.length; i++) {
-            attributeSelectionMethods.add(args[i]);
-        }
-
         ClassificationEvaluator ce = new ClassificationEvaluator(data);
 
-        for (String asMethod : attributeSelectionMethods) {
-            classifyAndEvaluate(prop.getProperty("attributeRankingOutputFile") + asMethod + ".csv", prop.getProperty("resultLocation") + asMethod + ".csv", ce,
-                    Integer.parseInt(prop.getProperty("topKmin")), Integer.parseInt(prop.getProperty("topKmax")));
+        File folder = new File(args[1]);
+        File[] listOfFiles = folder.listFiles();
+
+        for (File asMethod : listOfFiles) {
+            if (asMethod.isFile()) {
+                classifyAndEvaluate(asMethod.getAbsolutePath(), new File(args[2], asMethod.getName()).getAbsolutePath(), ce,
+                        Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+            }
         }
     }
 
@@ -45,19 +41,19 @@ public class WEKA_Evaluator {
         try {
             CSVWriter writer = new CSVWriter(new FileWriter(resultLocation), ',');
 
-            String[] header = {"#ofAttributes","SMO","LR","NB","KNN3","KNN5"};
+            String[] header = {"#ofAttributes","SMO","LR","NB","KNN3","KNN5", "average"};
 
             writer.writeNext(header);
 
             for (int k = topKmin; k <= topKmax; k++) {
 
-                //LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
+                LOGGER.info(": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
 
                 String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
                 writer.writeNext(result.split(","));
                 writer.flush();
 
-                //LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
+                LOGGER.info(": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
             }
 
             writer.close();
