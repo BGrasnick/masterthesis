@@ -5,11 +5,15 @@ import weka.attributeSelection.*;
 import weka.core.Instances;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 public class AttributeSelector {
 
+    private final static Logger LOGGER = Logger.getLogger(AttributeSelector.class.getName());
+
     private String selectionMethod;
     private Instances data;
+    private AttributeSelection attributeSelection;
 
     public AttributeSelector(Instances data, String selectionMethod){
 
@@ -18,7 +22,7 @@ public class AttributeSelector {
 
     }
 
-    public AttributeSelection selectAttributes() {
+    public void selectAttributes() {
         ASEvaluation eval;
 
         switch (this.selectionMethod) {
@@ -52,23 +56,31 @@ public class AttributeSelector {
 
         Ranker ranker = new Ranker();
 
-        AttributeSelection attsel = new AttributeSelection();
+        this.attributeSelection = new AttributeSelection();
 
-        attsel.setEvaluator(eval);
-        attsel.setSearch(ranker);
+        this.attributeSelection.setEvaluator(eval);
+        this.attributeSelection.setSearch(ranker);
 
         // perform attribute selection
 
+
+
+        long begin = System.currentTimeMillis();
+
         try {
-            attsel.SelectAttributes(data);
+            this.attributeSelection.SelectAttributes(data);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return attsel;
+        long end = System.currentTimeMillis();
+
+        long dt = end - begin;
+
+        LOGGER.info("" + dt + "," + this.selectionMethod);
     }
 
-    public void saveSelectedAttributes(AttributeSelection attsel, String saveLocation) {
+    public void saveSelectedAttributes(String saveLocation) {
 
         try {
 
@@ -78,15 +90,15 @@ public class AttributeSelector {
 
             writer.writeNext(header);
 
-            double[][] rankedAtts = attsel.rankedAttributes();
+            double[][] rankedAttributes = this.attributeSelection.rankedAttributes();
 
-            for (int i = 0; i < rankedAtts.length; i++) {
+            for (int i = 0; i < rankedAttributes.length; i++) {
 
-                String attributeName = data.attribute((int) rankedAtts[i][0]).name();
+                String attributeName = data.attribute((int) rankedAttributes[i][0]).name();
 
-                String score = "" + rankedAtts[i][1];
+                String score = "" + rankedAttributes[i][1];
 
-                String index = "" + (int) rankedAtts[i][0];
+                String index = "" + (int) rankedAttributes[i][0];
 
                 String[] entry = {attributeName, score, index};
 

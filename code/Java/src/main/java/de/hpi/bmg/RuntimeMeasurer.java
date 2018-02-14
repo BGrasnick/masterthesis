@@ -39,7 +39,7 @@ public class RuntimeMeasurer {
 
                         long begin = System.currentTimeMillis();
 
-                        AttributeSelection attsel = as.selectAttributes();
+                        as.selectAttributes();
 
                         long end = System.currentTimeMillis();
 

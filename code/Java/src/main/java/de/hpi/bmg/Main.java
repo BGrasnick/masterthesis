@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static de.hpi.bmg.Utils.loadProperties;
+
 public class Main {
 
     private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
@@ -68,76 +70,9 @@ public class Main {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format( new Date() );
     }
 
-    private static Properties loadProperties(String propertiesLocation) {
-
-        Properties prop = new Properties();
-
-        InputStream input = null;
-
-        try {
-            input = new FileInputStream(propertiesLocation);
-
-            // load a properties file
-            prop.load(input);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return prop;
-    }
-
-    private static void classifyAndEvaluate(String attributeRankingFileLocation, String resultLocation, ClassificationEvaluator ce, int topKmin, int topKmax) {
-
-        try {
-            CSVWriter writer = new CSVWriter(new FileWriter(resultLocation), ',');
-
-            String[] header = {"#ofAttributes","SMO","LR","NB","KNN3","KNN5"};
-
-            writer.writeNext(header);
-
-            for (int k = topKmin; k <= topKmax; k++) {
-
-                //LOGGER.info(getCurrentTimestamp() + ": Starting classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
-
-                String result = ce.trainAndEvaluateWithTopKAttributes(k, attributeRankingFileLocation);
-                writer.writeNext(result.split(","));
-                writer.flush();
-
-                //LOGGER.info(getCurrentTimestamp() + ": Finished classification evaluation with models SMO, LR, NB, KNN3, KNN5 with k of " + k + " [" + attributeRankingFileLocation + "]");
-            }
-
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private static void removeAttributes(Instances data, String attributeRankingOutputFileLocation) {
 
         AttributeRemover.removeUnusedAttributes(data, 100, attributeRankingOutputFileLocation);
-
-    }
-
-    private static void selectAttributes(Instances data, String attributeSelectionMethod, String attributeRankingOutputFile) {
-
-        //LOGGER.info(getCurrentTimestamp() + ": Starting attribute selection with method " + attributeSelectionMethod);
-
-        AttributeSelector as = new AttributeSelector(data, attributeSelectionMethod);
-
-        long begin = System.currentTimeMillis();
-
-        AttributeSelection attsel = as.selectAttributes();
-
-        long end = System.currentTimeMillis();
-
-        long dt = end - begin;
-
-        LOGGER.info("" + dt + "," + attributeSelectionMethod);
-
-        as.saveSelectedAttributes(attsel, attributeRankingOutputFile);
 
     }
 
