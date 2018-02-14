@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from utils import createOrClearDirectory
+from disgenet.utils import createOrClearDirectory
 
 def selectTopGenesPerDisease(postIdMappingLocation, selectedGenesPath, useThreshold, threshold, topK):
 

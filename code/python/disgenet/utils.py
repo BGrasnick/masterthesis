@@ -31,11 +31,9 @@ def loadFeatureNames(geneExpressionDataLocation):
 
     return featureNames
 
-def readConfig():
-    config = configparser.ConfigParser()
-    config.read('config.ini')
+def createLocationsFromConfig(config):
 
-    if config['selection'].getboolean("useThreshold"):
+    if config['selection']["useThreshold"]:
 
         selectedGenesPath = "../../../data/disgenet/selectedThreshold" + str(config['selection']['threshold']) \
             .replace(".", "") + "/"
@@ -56,7 +54,7 @@ def readConfig():
         genesWithReplacedNamesLocation = config['dataLocations']['rankedGeneNameList'] + "Top" + \
                                      str(config['selection']['topK']) + ".csv"
 
-    return config, selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation
+    return selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation
 
 def saveTupleList(fileName, tupleList):
     with open(fileName, "w") as csvfile:

@@ -2,7 +2,7 @@ import operator
 
 import pandas as pd
 import csv, os
-from utils import createOrClearDirectory
+from disgenet.utils import createOrClearDirectory
 
 def mapToTCGAIds(geneDiseaseAssociationsLocation, postIdMappingLocation, featureNames, geneNameSeparator, useThreshold, threshold, topK):
 

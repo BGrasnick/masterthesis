@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from utils import createOrClearDirectory
+from disgenet.utils import createOrClearDirectory
 
 
 def mapToEnsemblIds(geneDiseaseAssociationsLocation, postIdMappingLocation, uniProtToEnsemblMap, featureNames, useAllUniprotIds, useAllEnsemblIds):
