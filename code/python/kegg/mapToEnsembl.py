@@ -1,11 +1,11 @@
-from utils import writeSetToFile
+from kegg.utils import writeSetToFile
 
 from disgenet.utils import loadUniProtToEnsemblMap
 
-def mapToEnsembl(geneIdListLocation, ensemblIdListLocation):
+def mapToEnsembl(geneIdListLocation, ensemblIdListLocation, KEGGtoUniprotLocation, uniprotToEnsemblLocation):
 
-    uniprotKEGGMap = loadUniProtToEnsemblMap("../../../data/disgenet/HUMAN_9606_idmapping.dat/uniprotToKEGG_swapped.tsv")
-    uniprotEnsemblMap = loadUniProtToEnsemblMap("../../../data/disgenet/HUMAN_9606_idmapping.dat/uniprotToEnsembl.tsv")
+    uniprotKEGGMap = loadUniProtToEnsemblMap(KEGGtoUniprotLocation)
+    uniprotEnsemblMap = loadUniProtToEnsemblMap(uniprotToEnsemblLocation)
 
     geneIdList = [line.rstrip() for line in open(geneIdListLocation)]
 

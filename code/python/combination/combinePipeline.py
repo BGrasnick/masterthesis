@@ -1,14 +1,23 @@
 import pandas as pd
-import os
 
-rowVars = pd.read_csv("/home/basti/development/masterthesis/for_real/resultsFromVM/GDC/good/rankedAttributes/rowVars.csv")
-infoGain = pd.read_csv("/home/basti/development/masterthesis/for_real/resultsFromVM/GDC/good/rankedAttributes/InfoGain.csv")
+def executeCombinePipeline(config):
 
-for file in os.listdir("./input"):
-    Kegg = pd.read_csv(os.path.join("./input", file), header=None)
+    keggGenes = pd.read_csv(config["combination"]["KEGG"]["ensemblIdListLocation"], header = None)
 
-    rowVarsKegg = rowVars[rowVars['attributeName'].isin(Kegg[Kegg.columns[0]].tolist())]
-    infoGainKegg = infoGain[infoGain['attributeName'].isin(Kegg[Kegg.columns[0]].tolist())]
+    disgenetRanking = pd.read_csv(config["disgenet"]["dataLocations"]["featureRankingOutputLocation"])
 
-    rowVarsKegg.to_csv(os.path.join("./results", file).replace(".txt","rowVars.csv"), index = False)
-    infoGainKegg.to_csv(os.path.join("./results", file).replace(".txt","infoGain.csv"), index = False)
+    computationalMethodRankingLocations = []
+
+    for method in config["combination"]["FS-methods"]:
+        if method == "VB-FS":
+            computationalMethodRankingLocations.append((pd.read_csv(config["VB-FS"]["featureRankingOutputLocation"]), method))
+        else:
+            computationalMethodRankingLocations.append((pd.read_csv(config["WEKA-FS"]["featureRankingOutputLocation"] + method + ".csv"),method))
+
+    for method in computationalMethodRankingLocations:
+
+        combinationWithKEGG = method[0][method[0]['attributeName'].isin(keggGenes[keggGenes.columns[0]].tolist())]
+        combinationWithDisgenet = method[0][method[0]['attributeName'].isin(disgenetRanking["attributeName"].tolist())]
+
+        combinationWithKEGG.to_csv(config["combination"]["resultsLocation"] + "KEGG_" + method[1] + ".csv", index = False)
+        combinationWithDisgenet.to_csv(config["combination"]["resultsLocation"] + "Disgenet_" + method[1] + ".csv", index = False)

@@ -1,4 +1,4 @@
-from utils import writeSetToFile
+from kegg.utils import writeSetToFile
 
 import requests
 

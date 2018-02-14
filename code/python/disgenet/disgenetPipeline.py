@@ -11,7 +11,7 @@ from disgenet.utils import createOrClearDirectory, loadUniProtToEnsemblMap, load
 
 def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
-    selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation = createLocationsFromConfig(config)
+    selectedGenesPath, mergedTopGenesLocation = createLocationsFromConfig(config)
 
     featureNames = loadFeatureNames(geneExpressionDataLocation)
 
@@ -69,7 +69,7 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
-        saveTupleList(genesWithReplacedNamesLocation, interleavedTopGeneList)
+        saveTupleList(config["dataLocations"]["featureRankingOutputLocation"], interleavedTopGeneList)
 
     else:
 
@@ -86,7 +86,7 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
-        saveTupleList(genesWithReplacedNamesLocation, topGeneList)
+        saveTupleList(config["dataLocations"]["featureRankingOutputLocation"], topGeneList)
 
 if __name__ == '__main__':
 

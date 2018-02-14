@@ -1,6 +1,4 @@
-from utils import writeSetToFile
-
-import pdb
+from kegg.utils import writeSetToFile
 
 def combineIdLists(firstListLocation, secondListLocation, combinedListLocation):
 

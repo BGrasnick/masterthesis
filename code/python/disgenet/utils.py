@@ -41,9 +41,6 @@ def createLocationsFromConfig(config):
         mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Threshold" + \
                                  str(config['selection']['threshold']).replace(".", "") + ".csv"
 
-        genesWithReplacedNamesLocation = config["dataLocations"]["rankedGeneNameList"] + "Threshold" + \
-                                     str(config['selection']['threshold']).replace(".", "") + ".csv"
-
     else:
 
         selectedGenesPath = "../../../data/disgenet/selectedTop" + str(config['selection']['topK']) + "/"
@@ -51,10 +48,7 @@ def createLocationsFromConfig(config):
         mergedTopGenesLocation = config['dataLocations']['mergedTopGenesLocation'] + "Top" + \
                                  str(config['selection']['topK']) + ".csv"
 
-        genesWithReplacedNamesLocation = config['dataLocations']['rankedGeneNameList'] + "Top" + \
-                                     str(config['selection']['topK']) + ".csv"
-
-    return selectedGenesPath, mergedTopGenesLocation, genesWithReplacedNamesLocation
+    return selectedGenesPath, mergedTopGenesLocation
 
 def saveTupleList(fileName, tupleList):
     with open(fileName, "w") as csvfile:
