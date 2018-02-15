@@ -3,7 +3,7 @@
   "preprocessing": {
     "dataFileLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts.csv",
     "diseaseCodeFileLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts_metadata.csv",
-    "outputLocation" : "../../../data/GDC/bli.csv"
+    "outputLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_HTSeq-Counts_WithDiseaseCodes.csv"
   },
   "dataset": {
     "geneNameSeparator": "|"
