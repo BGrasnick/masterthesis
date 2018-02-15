@@ -17,12 +17,12 @@ def executeFrameworkPipeline():
     ### PREPROCESSING ###
     #####################
 
-    #addDiseaseCodeToData(jsonConfig["preprocessing"]["dataFileLocation"], jsonConfig["preprocessing"]["diseaseCodeFileLocation"], jsonConfig["preprocessing"]["outputLocation"])
+    addDiseaseCodeToData(jsonConfig["preprocessing"]["dataFileLocation"], jsonConfig["preprocessing"]["diseaseCodeFileLocation"], jsonConfig["preprocessing"]["outputLocation"])
 
     #########################
     ### FEATURE SELECTION ###
     #########################
-    '''
+
     # DISGENET FEATURE SELECTION
 
     executeDisgenetPipeline(jsonConfig["disgenet"], jsonConfig["preprocessing"]["outputLocation"])
@@ -54,8 +54,6 @@ def executeFrameworkPipeline():
     # COMBINE KNOWLEDGE BASE AND COMPUTATIONAL FEATURE RANKINGS
 
     executeCombinePipeline(jsonConfig)
-    
-    '''
 
     ##########################
     ### FEATURE EVALUATION ###

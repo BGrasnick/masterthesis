@@ -1,0 +1,64 @@
+{
+  "name": "featureSelectionCombinationEvaluationFramework",
+  "preprocessing": {
+    "dataFileLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts.csv",
+    "diseaseCodeFileLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_TB_HTSeq-Counts_metadata.csv",
+    "outputLocation" : "../../../data/GDC/TCGA-GBM_TCGA-THCA_TCGA-LAML_TCGA-HNSC_TCGA-LUAD_TCGA-UCEC_TCGA-KIRC_TCGA-SARC__GeneExpressionQuantification_TP_HTSeq-Counts_WithDiseaseCodes.csv"
+  },
+  "disgenet": {
+    "dataLocations": {
+      "geneDiseaseAssociationsLocation": "../../../data/disgenet/downloaded/",
+      "postIdMappingLocation": "../../../data/disgenet/mapped/",
+      "mergedTopGenesLocation": "../../../data/disgenet/mergedTopGenes",
+      "filteredOutputLocation": "../../../data/filteredByDisgenetGenes",
+      "disgenetDiseaseCodesLocation": "../../../data/GDC/diseases_UMLS_codes.txt",
+      "uniprotToEnsemblMapLocation": "../../../data/disgenet/HUMAN_9606_idmapping.dat/uniprotToEnsembl.tsv",
+      "featureRankingOutputLocation" : "../../../data/rankedAttributes/disgenet.csv"
+    },
+    "selection" : {
+      "useThreshold" : false,
+      "threshold" : 0.2,
+      "topK" : 25
+    },
+    "filtering" : {
+      "geneNameSeparator": "|",
+      "topK": 50
+    },
+    "pipeline" : {
+      "interleave": 2,
+      "dataset": "GDC",
+      "useAllUniprotIds": true,
+      "useAllEnsemblIds": true
+    }
+  },
+  "VB-FS": {
+    "featureRankingOutputLocation": "../../../data/rankedAttributes/rowVars2345.csv"
+  },
+  "WEKA-FS" : {
+    "FS-methods": [
+      "InfoGain",
+      "ReliefF",
+      "SVM-RFE"
+    ],
+    "featureRankingOutputLocation" : "../../../data/rankedAttributes/frameworkTest"
+  },
+  "combination" : {
+    "KEGG": {
+      "KEGG_entityIdListLocation" : "../../../data/KEGG/input/pathways.txt",
+      "geneIdListLocation" : "../../../data/KEGG/results/geneIdList.txt",
+      "ensemblIdListLocation" : "../../../data/KEGG/results/ensemblIdList.txt",
+      "uniprotToKEGG" : "../../../data/disgenet/HUMAN_9606_idmapping.dat/KEGGtoUniprotLocation.tsv"
+    },
+    "FS-methods": [
+      "InfoGain",
+      "VB-FS"
+    ],
+    "resultsLocation" : "../../../data/rankedAttributes/",
+    "combineExternalKnowledge" : true
+  },
+  "evaluation" : {
+    "topKmin" : 2,
+    "topKmax" : 100,
+    "resultsLocation" : "../../../data/results/"
+  }
+}
