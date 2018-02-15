@@ -6,7 +6,6 @@ import weka.core.Instances;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class WEKA_Evaluator {

@@ -63,8 +63,6 @@ public class AttributeSelector {
 
         // perform attribute selection
 
-
-
         long begin = System.currentTimeMillis();
 
         try {
@@ -84,7 +82,7 @@ public class AttributeSelector {
 
         try {
 
-            CSVWriter writer = new CSVWriter(new FileWriter(saveLocation + this.selectionMethod + ".csv"), ',');
+            CSVWriter writer = new CSVWriter(new FileWriter(saveLocation + "/" + this.selectionMethod + ".csv"), ',');
 
             String[] header = {"attributeName","score","index"};
 
