@@ -9,14 +9,14 @@ from disgenet.selectTopGenesPerDisease import selectTopGenesPerDisease
 from disgenet.utils import createOrClearDirectory, loadUniProtToEnsemblMap, loadFeatureNames, createLocationsFromConfig, saveTupleList
 
 
-def executeDisgenetPipeline(config, geneExpressionDataLocation):
+def executeDisgenetPipeline(config, geneExpressionDataLocation, resultsLocation, geneNameSeparator, uniprotToEnsemblMapLocation):
 
     selectedGenesPath, mergedTopGenesLocation = createLocationsFromConfig(config)
 
     featureNames = loadFeatureNames(geneExpressionDataLocation)
 
     if config["pipeline"]["dataset"] == "GDC":
-        uniProtToEnsemblMap = loadUniProtToEnsemblMap(config["dataLocations"]["uniprotToEnsemblMapLocation"])
+        uniProtToEnsemblMap = loadUniProtToEnsemblMap(uniprotToEnsemblMapLocation)
 
     begin_timestamp = time.time()
 
@@ -38,7 +38,7 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
         mapToTCGAIds(config['dataLocations']['geneDiseaseAssociationsLocation'],
                      config["dataLocations"]["postIdMappingLocation"], featureNames,
-                     config["filtering"]["geneNameSeparator"], config['selection']["useThreshold"],
+                     geneNameSeparator, config['selection']["useThreshold"],
                      config['selection']['threshold'], config['selection']['topK'])
 
     #mapping_timestamp = time.time()
@@ -69,7 +69,7 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
-        saveTupleList(config["dataLocations"]["featureRankingOutputLocation"], interleavedTopGeneList)
+        saveTupleList(resultsLocation + "disgenet.csv", interleavedTopGeneList)
 
     else:
 
@@ -86,7 +86,7 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation):
 
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
-        saveTupleList(config["dataLocations"]["featureRankingOutputLocation"], topGeneList)
+        saveTupleList(resultsLocation + "disgenet.csv", topGeneList)
 
 if __name__ == '__main__':
 

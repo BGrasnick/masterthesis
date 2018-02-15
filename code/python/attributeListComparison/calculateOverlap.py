@@ -3,9 +3,9 @@ from os import listdir
 from os.path import isfile, join
 import itertools
 
-topK = 50
+topK = 100
 
-path = "../../../data/rankedAttributes"
+path = "../../../data/overlap/"
 
 onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 
