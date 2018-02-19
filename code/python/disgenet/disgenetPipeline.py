@@ -87,7 +87,3 @@ def executeDisgenetPipeline(config, geneExpressionDataLocation, resultsLocation,
         print("total elapsed time: %f" % (end_timestamp - begin_timestamp))
 
         saveTupleList(resultsLocation + "disgenet.csv", topGeneList)
-
-if __name__ == '__main__':
-
-    executeDisgenetPipeline()

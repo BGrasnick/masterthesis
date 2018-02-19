@@ -1,5 +1,4 @@
 import pandas as pd
-import pdb
 
 def reduceDataset(config, datasetLocation, featureSelectionResultsLocation):
 
@@ -25,3 +24,10 @@ def reduceDataset(config, datasetLocation, featureSelectionResultsLocation):
         columnList.extend(list(combinedGenes))
         reducedDataset = dataset.filter(columnList)
         reducedDataset.to_csv(config["reducedDatasetLocation"], index = False)
+
+    # update the dataset feature index for each feature in the disgenet feature ranking
+
+    for i, row in disgenetRanking.iterrows():
+        disgenetRanking.set_value(i, 'index', reducedDataset.columns.get_loc(row["attributeName"]))
+
+    disgenetRanking.to_csv(featureSelectionResultsLocation + "disgenet.csv", index=False)
